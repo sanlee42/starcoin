@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::miner::Miner;
-use logger::prelude::*;
 use sc_stratum::*;
-use std::sync::Arc;
 
 pub struct StratumManager {
     miner: Miner,
@@ -28,6 +26,8 @@ mod tests {
     use super::*;
     use crate::miner::MineCtx;
     use bus::BusActor;
+    use std::sync::Arc;
+    use logger::prelude::*;
     use jsonrpc_core::futures::{future, Future};
     use jsonrpc_tcp_server::tokio::{
         io,

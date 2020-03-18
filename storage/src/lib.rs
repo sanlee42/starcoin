@@ -375,6 +375,7 @@ mod tests {
             0,
             0,
             U256::zero(),
+            U256::zero(),
             consensus_header,
         );
         storage.block_store.save_header(block_header1.clone());
@@ -427,6 +428,7 @@ mod tests {
             HashValue::zero(),
             0,
             0,
+            U256::zero(),
             U256::zero(),
             consensus_header,
         );
@@ -493,6 +495,7 @@ mod tests {
             0,
             0,
             U256::zero(),
+            U256::zero(),
             consensus_header.clone(),
         );
         storage.block_store.save_header(block_header0.clone());
@@ -507,6 +510,7 @@ mod tests {
             HashValue::zero(),
             0,
             0,
+            U256::zero(),
             U256::zero(),
             consensus_header.clone(),
         );
@@ -523,6 +527,7 @@ mod tests {
             0,
             0,
             U256::zero(),
+            U256::zero(),
             consensus_header.clone(),
         );
         storage.block_store.save_header(block_header2.clone());
@@ -538,6 +543,7 @@ mod tests {
             0,
             0,
             U256::zero(),
+            U256::zero(),
             consensus_header.clone(),
         );
         storage.block_store.save_header(block_header3.clone());
@@ -552,6 +558,7 @@ mod tests {
             HashValue::zero(),
             0,
             0,
+            U256::zero(),
             U256::zero(),
             consensus_header,
         );

@@ -19,7 +19,7 @@ pub type BlockNumber = u64;
 pub type BranchNumber = (HashValue, u64);
 
 #[derive(
-    Default, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize, CryptoHash,
+Default, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Serialize, Deserialize, CryptoHash,
 )]
 pub struct BlockHeader {
     /// Parent hash.
@@ -40,6 +40,8 @@ pub struct BlockHeader {
     gas_limit: u64,
     /// Block difficult
     difficult: U256,
+    /// Total difficult
+    total_difficult: U256,
     /// Consensus extend header field.
     consensus_header: Vec<u8>,
 }
@@ -55,10 +57,11 @@ impl BlockHeader {
         gas_used: u64,
         gas_limit: u64,
         difficult: U256,
+        total_difficult: U256,
         consensus_header: H,
     ) -> BlockHeader
-    where
-        H: Into<Vec<u8>>,
+        where
+            H: Into<Vec<u8>>,
     {
         BlockHeader {
             parent_hash,
@@ -70,6 +73,7 @@ impl BlockHeader {
             gas_used,
             gas_limit,
             difficult,
+            total_difficult,
             consensus_header: consensus_header.into(),
         }
     }
@@ -117,6 +121,9 @@ impl BlockHeader {
     pub fn into_metadata(self) -> BlockMetadata {
         BlockMetadata::new(self.id(), self.timestamp, self.author)
     }
+
+    pub fn total_difficult(&self) -> U256 { self.total_difficult }
+
     pub fn difficult(&self) -> U256 {
         self.difficult
     }
@@ -140,6 +147,7 @@ impl BlockHeader {
             /// Block difficult
             difficult: U256::zero(),
             /// Block proof of work extend field.
+            total_difficult: U256::zero(),
             consensus_header: HashValue::zero().to_vec(),
         }
     }
@@ -162,6 +170,7 @@ impl BlockHeader {
             //TODO
             gas_limit: 0,
             difficult: U256::zero(),
+            total_difficult: U256::zero(),
             consensus_header,
         }
     }
@@ -185,6 +194,7 @@ impl BlockHeader {
             gas_limit: std::u64::MAX,
             /// Block proof of work extend field.
             difficult: U256::zero(),
+            total_difficult: U256::zero(),
             consensus_header: HashValue::random().to_vec(),
         }
     }
@@ -238,8 +248,8 @@ pub struct Block {
 
 impl Block {
     pub fn new<B>(header: BlockHeader, body: B) -> Self
-    where
-        B: Into<BlockBody>,
+        where
+            B: Into<BlockBody>,
     {
         Block {
             header,
@@ -354,6 +364,9 @@ pub struct BlockTemplate {
     /// Block difficult
     pub difficult: U256,
 
+    /// Total difficult
+    pub total_difficult: U256,
+    
     pub body: BlockBody,
 }
 
@@ -368,6 +381,7 @@ impl BlockTemplate {
         gas_used: u64,
         gas_limit: u64,
         difficult: U256,
+        total_difficult: U256,
         body: BlockBody,
     ) -> Self {
         Self {
@@ -380,13 +394,14 @@ impl BlockTemplate {
             gas_used,
             gas_limit,
             difficult,
+            total_difficult,
             body,
         }
     }
 
     pub fn into_block<H>(self, consensus_header: H) -> Block
-    where
-        H: Into<Vec<u8>>,
+        where
+            H: Into<Vec<u8>>,
     {
         let header = BlockHeader::new(
             self.parent_hash,
@@ -398,6 +413,7 @@ impl BlockTemplate {
             self.gas_used,
             self.gas_limit,
             self.difficult,
+            self.total_difficult,
             consensus_header.into(),
         );
         Block {
@@ -406,8 +422,8 @@ impl BlockTemplate {
         }
     }
     pub fn into_block_header<H>(self, consensus_header: H) -> BlockHeader
-    where
-        H: Into<Vec<u8>>,
+        where
+            H: Into<Vec<u8>>,
     {
         let header = BlockHeader::new(
             self.parent_hash,
@@ -419,6 +435,7 @@ impl BlockTemplate {
             self.gas_used,
             self.gas_limit,
             self.difficult,
+            self.total_difficult,
             consensus_header.into(),
         );
         header
@@ -434,8 +451,8 @@ impl BlockTemplate {
             state_root: block.header().state_root,
             gas_used: block.header().gas_used,
             gas_limit: block.header().gas_limit,
-
             difficult: block.header().difficult,
+            total_difficult:block.header().total_difficult,
             body: block.body,
         }
     }

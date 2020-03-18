@@ -27,11 +27,11 @@ use types::{
 };
 
 pub struct BlockChain<E, C, S, P>
-where
-    E: TransactionExecutor,
-    C: Consensus,
-    S: BlockChainStore + 'static,
-    P: TxPoolAsyncService + 'static,
+    where
+        E: TransactionExecutor,
+        C: Consensus,
+        S: BlockChainStore + 'static,
+        P: TxPoolAsyncService + 'static,
 {
     pub config: Arc<NodeConfig>,
     //TODO
@@ -46,11 +46,11 @@ where
 }
 
 impl<E, C, S, P> BlockChain<E, C, S, P>
-where
-    E: TransactionExecutor,
-    C: Consensus,
-    S: BlockChainStore,
-    P: TxPoolAsyncService,
+    where
+        E: TransactionExecutor,
+        C: Consensus,
+        S: BlockChainStore,
+        P: TxPoolAsyncService,
 {
     pub fn new(
         config: Arc<NodeConfig>,
@@ -83,7 +83,7 @@ where
                 block_info.num_nodes,
                 storage.clone(),
             )
-            .unwrap(),
+                .unwrap(),
             head,
             chain_state: ChainStateDB::new(storage.clone(), Some(state_root)),
             phantom_e: PhantomData,
@@ -211,13 +211,14 @@ where
         }
 
         let block_info = self.get_block_info(previous_header.id());
+
         let accumulator = MerkleAccumulator::new(
             block_info.frozen_subtree_roots,
             block_info.num_leaves,
             block_info.num_nodes,
             self.storage.clone(),
         )
-        .unwrap();
+            .unwrap();
         let (accumulator_root, first_leaf_idx) =
             accumulator.append_only_cache(&transaction_hash).unwrap();
         //Fixme proof verify
@@ -231,6 +232,16 @@ where
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs();
+        let parent_total_difficult = {
+            if let Some(parent) = self.get_block_by_number(previous_header.number()).unwrap() {
+                parent.header().total_difficult()
+            } else {
+                U256::zero()
+            }
+        };
+        
+        let total_difficult = parent_total_difficult + self.head.header().total_difficult();
+        
         Ok(BlockTemplate::new(
             previous_header.id(),
             timestamp,
@@ -241,17 +252,18 @@ where
             0,
             0,
             difficulty,
+            total_difficult,
             user_txns.into(),
         ))
     }
 }
 
 impl<E, C, S, P> ChainReader for BlockChain<E, C, S, P>
-where
-    E: TransactionExecutor,
-    C: Consensus,
-    S: BlockChainStore,
-    P: TxPoolAsyncService,
+    where
+        E: TransactionExecutor,
+        C: Consensus,
+        S: BlockChainStore,
+        P: TxPoolAsyncService,
 {
     fn head_block(&self) -> Block {
         self.head.clone()
@@ -350,11 +362,11 @@ where
 }
 
 impl<E, C, S, P> ChainWriter for BlockChain<E, C, S, P>
-where
-    E: TransactionExecutor,
-    C: Consensus,
-    S: BlockChainStore,
-    P: TxPoolAsyncService,
+    where
+        E: TransactionExecutor,
+        C: Consensus,
+        S: BlockChainStore,
+        P: TxPoolAsyncService,
 {
     fn apply(&mut self, block: Block) -> Result<()> {
         let header = block.header();
