@@ -136,7 +136,7 @@ impl Worker {
     }
 }
 
-fn argon2_hash(input: &[u8]) -> Result<H256> {
+pub fn argon2_hash(input: &[u8]) -> Result<H256> {
     let mut config = argon2::Config::default();
     config.mem_cost = 1024;
     let output = argon2::hash_raw(input, input, &config)?;

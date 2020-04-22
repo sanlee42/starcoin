@@ -1,4 +1,4 @@
-mod test {
+mod tests {
     use crate::miner::{MineCtx, Miner};
     use crate::miner_client::miner::MinerClientActor;
     use crate::stratum::StratumManager;
@@ -15,6 +15,7 @@ mod test {
     use std::time::Duration;
     use types::block::{Block, BlockBody, BlockHeader, BlockTemplate};
     use types::U256;
+    use crate::miner_client::worker::argon2_hash;
 
     #[test]
     fn test_stratum_client() {
@@ -47,5 +48,13 @@ mod test {
                 Delay::new(Duration::from_millis(2000)).await;
             }
         });
+    }
+
+    #[test]
+    fn test_argon_hash() {
+        for _ in { 1..10000000 } {
+            let input = "123123123lk12j3kljklasdadssjdklajslkajsdklasjd".as_bytes();
+            let _ = argon2_hash(input);
+        }
     }
 }

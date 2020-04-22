@@ -1,7 +1,7 @@
 pub mod miner;
 mod stratum;
 #[cfg(test)]
-mod test;
+mod tests;
 mod worker;
 
 use byteorder::{LittleEndian, WriteBytesExt};
