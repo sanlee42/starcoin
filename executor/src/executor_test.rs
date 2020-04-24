@@ -15,6 +15,7 @@ use starcoin_state_api::{ChainState, ChainStateWriter};
 use state_tree::mock::MockStateNodeStore;
 use statedb::ChainStateDB;
 use std::sync::Arc;
+use std::time::{SystemTime, UNIX_EPOCH};
 use types::{
     access_path::AccessPath,
     account_address::AccountAddress,
@@ -24,6 +25,7 @@ use types::{
     transaction::Transaction,
     transaction::{Module, TransactionPayload},
     vm_error::{StatusCode, VMStatus},
+    block_metadata::BlockMetadata,
 };
 use vm_runtime::mock_vm::{
     encode_mint_transaction, encode_transfer_program, encode_transfer_transaction, KEEP_STATUS,
@@ -392,6 +394,20 @@ fn test_publish_module() -> Result<()> {
 
     let output = Executor::execute_transaction(&chain_state, txn).unwrap();
     assert_eq!(KEEP_STATUS.clone(), *output.status());
+
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    let txn2 = Transaction::BlockMetadata(BlockMetadata::new(
+        crypto::HashValue::zero(),
+        timestamp,
+        account1.address().clone(),
+        Some(account1.auth_key_prefix()),
+    ));
+
+    let output2 = Executor::execute_transaction(&chain_state, txn2).unwrap();
+    assert_eq!(KEEP_STATUS.clone(), *output2.status());
 
     let balance = get_balance(account1.address().clone(), &chain_state);
     debug!("balance= {:?}", balance);
