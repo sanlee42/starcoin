@@ -516,7 +516,9 @@ impl StarcoinVM {
                         };
 
                         if let LibraTransactionStatus::Keep(_) = result.status() {
-                            state_store.add_write_set(result.write_set())
+                            debug!("add write set>>>>>>");
+                            state_store.add_write_set(result.write_set());
+                            debug!("add write set done<<<<<");
                         };
                         TransactionOutput::from(result)
                     }

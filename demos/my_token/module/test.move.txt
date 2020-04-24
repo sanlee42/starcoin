@@ -1,0 +1,7 @@
+module MyToken {
+
+    struct T { }
+
+    public fun issue() {
+    }
+}

@@ -272,6 +272,7 @@ impl ChainState for ChainStateDB {}
 impl ChainStateReader for ChainStateDB {
     fn get(&self, access_path: &AccessPath) -> Result<Option<Vec<u8>>> {
         let (account_address, data_type, hash) = access_path.clone().into();
+        info!("^^^^^^^^^^^^ChainStateReader address={:?}, data_type= {:?}, hash={:?}", account_address, data_type, hash);
         self.get_account_state_object_option(&account_address)
             .and_then(|account_state| match account_state {
                 Some(account_state) => account_state.get(data_type, &hash),
@@ -360,8 +361,10 @@ impl ChainStateReader for ChainStateDB {
 impl ChainStateWriter for ChainStateDB {
     fn set(&self, access_path: &AccessPath, value: Vec<u8>) -> Result<()> {
         let (account_address, data_type, key_hash) = access_path.clone().into();
+        info!("*********ChainStateWriter address={:?}, data_type= {:?}, hash={:?}", account_address, data_type, key_hash);
         let account_state_object = self.get_account_state_object(&account_address, true)?;
         account_state_object.set(data_type, key_hash, value);
+        info!("********* success");
         Ok(())
     }
 

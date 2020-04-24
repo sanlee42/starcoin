@@ -19,7 +19,7 @@ module MyToken {
         Transaction::assert(Libra::market_cap<T>() == old_market_cap + 10000, 8002);
 
         // Create 'Balance<Token>' resource under sender account
-        LibraAccount::new_balance<T>();
+        LibraAccount::create_new_balance<T>();
         LibraAccount::deposit_to_sender<T>(coin)
 
     }
