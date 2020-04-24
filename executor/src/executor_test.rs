@@ -395,21 +395,24 @@ fn test_publish_module() -> Result<()> {
     let output = Executor::execute_transaction(&chain_state, txn).unwrap();
     assert_eq!(KEEP_STATUS.clone(), *output.status());
 
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs();
-    let txn2 = Transaction::BlockMetadata(BlockMetadata::new(
-        crypto::HashValue::zero(),
-        timestamp,
-        account1.address().clone(),
-        Some(account1.auth_key_prefix()),
-    ));
+    for i in 0..10 {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        let txn2 = Transaction::BlockMetadata(BlockMetadata::new(
+            crypto::HashValue::zero(),
+            timestamp,
+            account1.address().clone(),
+            Some(account1.auth_key_prefix()),
+        ));
 
-    let output2 = Executor::execute_transaction(&chain_state, txn2).unwrap();
-    assert_eq!(KEEP_STATUS.clone(), *output2.status());
+        let output2 = Executor::execute_transaction(&chain_state, txn2).unwrap();
+        assert_eq!(KEEP_STATUS.clone(), *output2.status());
 
-    let balance = get_balance(account1.address().clone(), &chain_state);
-    debug!("balance= {:?}", balance);
+        let balance = get_balance(account1.address().clone(), &chain_state);
+        debug!("balance= {:?}", balance);
+    }
+
     Ok(())
 }
