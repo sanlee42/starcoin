@@ -645,4 +645,43 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_read_uncommitted() -> Result<()> {
+        let storage = Arc::new(MockStateNodeStore::new());
+        let chain_state_db = ChainStateDB::new(storage.clone(), None);
+        let account_address = AccountAddress::random();
+        let access_path = AccessPath::new_for_balance(account_address);
+        let old_state = vec![0u8];
+        chain_state_db.set(&access_path, old_state.clone())?;
+        let new_state = vec![1u8];
+        chain_state_db.set(&access_path, new_state.clone())?;
+        let result = chain_state_db.get(&access_path)?;
+        assert!(result.is_some());
+        assert_eq!(new_state, result.unwrap());
+        Ok(())
+    }
+
+    //fix https://github.com/starcoinorg/starcoin/issues/310
+    #[test]
+    fn test_repeat_commit() -> Result<()> {
+        let storage = Arc::new(MockStateNodeStore::new());
+        let chain_state_db = ChainStateDB::new(storage.clone(), None);
+        let account_address0 = AccountAddress::random();
+        let access_path0 = AccessPath::new_for_balance(account_address0);
+        debug!("{}", access_path0);
+        let state0 = vec![0u8];
+        chain_state_db.set(&access_path0, state0.clone())?;
+
+        chain_state_db.commit()?;
+
+        chain_state_db.set(&access_path0, state0.clone())?;
+        chain_state_db.commit()?;
+
+        let result0 = chain_state_db.get(&access_path0)?;
+        assert!(result0.is_some());
+        assert_eq!(state0, result0.unwrap());
+
+        Ok(())
+    }
 }

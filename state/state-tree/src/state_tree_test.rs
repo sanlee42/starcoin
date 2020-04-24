@@ -154,3 +154,16 @@ pub fn test_state_dump() -> Result<()> {
     assert_eq!(1, state_set.len());
     Ok(())
 }
+
+#[test]
+pub fn test_repeat_commit() -> Result<()> {
+    let s = MockStateNodeStore::new();
+    let state = StateTree::new(Arc::new(s), None);
+    let hash_value = HashValue::random();
+    let value = vec![1u8, 2u8];
+    state.put(hash_value, value.clone());
+    state.commit()?;
+    state.put(hash_value, value);
+    state.commit()?;
+    Ok(())
+}
