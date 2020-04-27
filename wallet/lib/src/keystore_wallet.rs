@@ -27,8 +27,21 @@ pub type Result<T> = std::result::Result<T, WalletError>;
 #[derive(Default, Debug)]
 pub struct KeyStoreWallet<TKeyStore> {
     store: TKeyStore,
+
     default_account: Mutex<Option<WalletAccount>>,
     key_cache: RwLock<KeyCache>,
+}
+
+#[derive(Default, Debug)]
+struct AccountCache {
+    cache: HashMap<AccountAddress, WalletAccount>,
+}
+impl AccountCache {
+    pub fn new(initial_accounts: HashMap<AccountAddress, WalletAccount>) -> Self {
+        Self {
+            cache: initial_accounts,
+        }
+    }
 }
 
 #[derive(Default, Debug, PartialEq, Eq)]
@@ -79,6 +92,7 @@ where
     }
 
     fn get_account(&self, address: &AccountAddress) -> Result<Option<WalletAccount>> {
+        trace_time!("wallet:get_account");
         Ok(self.store.get_account(address)?)
     }
 
@@ -129,6 +143,7 @@ where
     }
 
     fn sign_txn(&self, raw_txn: RawUserTransaction) -> Result<SignedUserTransaction> {
+        trace_time!("wallet:sign_txn");
         let address = raw_txn.sender();
         if !self.contains(&address)? {
             return Err(WalletError::AccountNotExist(address));

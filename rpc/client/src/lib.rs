@@ -1,6 +1,9 @@
 // Copyright (c) The Starcoin Core Contributors
 // SPDX-License-Identifier: Apache-2
 
+#[macro_use]
+extern crate trace_time;
+
 use failure::Fail;
 use futures::{future::FutureExt, select, stream::StreamExt};
 use futures01::future::Future as Future01;
@@ -152,6 +155,8 @@ impl RpcClient {
 
     pub fn submit_transaction(&self, txn: SignedUserTransaction) -> anyhow::Result<bool> {
         self.call_rpc_blocking(|inner| async move {
+            trace!("rpc_client:submit_txn:start");
+            trace_time!("rpc_client:submit_txn");
             inner.txpool_client.submit_transaction(txn).compat().await
         })
         .map_err(map_err)
@@ -187,6 +192,8 @@ impl RpcClient {
         raw_txn: RawUserTransaction,
     ) -> anyhow::Result<SignedUserTransaction> {
         self.call_rpc_blocking(|inner| async move {
+            trace!("rpc_client:sign_txn:start");
+            trace_time!("rpc_client:sign_txn");
             inner.wallet_client.sign_txn(raw_txn).compat().await
         })
         .map_err(map_err)

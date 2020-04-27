@@ -65,11 +65,20 @@ where
     }
 
     fn sign_txn(&self, raw_txn: RawUserTransaction) -> FutureResult<SignedUserTransaction> {
+        let timer = trace_time::PerfTimer::new("wallet_rpc:sign_txn");
         let fut = self
             .service
             .clone()
             .sign_txn(raw_txn)
             .map_err(|e| map_rpc_err(e.into()));
+        let fut = async move {
+            let _outer_timer = timer;
+            trace!("wallet_rpc:sign_txn_inner:start");
+            let _inner_timer = trace_time::PerfTimer::new("wallet_rpc:sign_txn_inner");
+            let result = fut.await;
+            result
+        };
+        let fut = Box::pin(fut);
         Box::new(fut.compat())
     }
 

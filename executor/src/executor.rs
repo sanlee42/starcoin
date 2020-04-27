@@ -9,6 +9,7 @@ use starcoin_state_api::{ChainState, ChainStateReader, ChainStateWriter};
 use statedb::ChainStateDB;
 use std::sync::Arc;
 use storage::{cache_storage::CacheStorage, storage::StorageInstance, Storage};
+
 use types::{
     account_address::AccountAddress,
     state_set::ChainStateSet,
@@ -63,6 +64,7 @@ impl TransactionExecutor for Executor {
         chain_state: &dyn ChainState,
         txn: SignedUserTransaction,
     ) -> Option<VMStatus> {
+        trace_time!("executor:validate_transaction");
         let mut vm = StarcoinVM::new();
         vm.verify_transaction(chain_state, txn)
     }

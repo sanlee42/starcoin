@@ -17,6 +17,7 @@ use common_crypto::hash::{CryptoHash, HashValue};
 use futures_channel::mpsc;
 use starcoin_bus::{Bus, BusActor};
 use starcoin_config::TxPoolConfig;
+use starcoin_logger::prelude::*;
 use std::sync::Arc;
 use storage::Store;
 use tx_relay::{PeerTransactions, PropagateNewTransactions};
@@ -142,6 +143,8 @@ type TxnStatusEvent = Arc<Vec<(HashValue, TxStatus)>>;
 /// Listen to txn status, and propagate to remote peers if necessary.
 impl StreamHandler<TxnStatusEvent> for TxPoolActor {
     fn handle(&mut self, item: TxnStatusEvent, ctx: &mut Context<Self>) {
+        trace!("txpool_actor:tx_status_event:start");
+        trace_time!("txpool_actor:tx_status_event");
         {
             let status = self.queue.status().status;
             let mem_usage = status.mem_usage;
@@ -191,7 +194,7 @@ impl StreamHandler<TxnStatusEvent> for TxPoolActor {
                 }
                 async {}.into_actor(act)
             })
-            .wait(ctx);
+            .spawn(ctx);
     }
 }
 
@@ -199,6 +202,9 @@ impl actix::Handler<SystemEvents> for TxPoolActor {
     type Result = ();
 
     fn handle(&mut self, msg: SystemEvents, _ctx: &mut Self::Context) -> Self::Result {
+        trace!("txpool_actor:system_event:start");
+        trace_time!("txpool_actor:system_event");
+
         match msg {
             SystemEvents::NewHeadBlock(block) => {
                 self.chain_header = block.get_block().clone().into_inner().0;
@@ -245,6 +251,8 @@ impl actix::Handler<ImportTxns> for TxPoolActor {
     type Result = actix::MessageResult<ImportTxns>;
 
     fn handle(&mut self, msg: ImportTxns, _ctx: &mut Self::Context) -> Self::Result {
+        trace!("txpool_actor:import_txns:start");
+        trace_time!("txpool_actor:import_txns");
         let ImportTxns { txns } = msg;
 
         let txns = txns
@@ -271,6 +279,9 @@ impl actix::Handler<RemoveTxn> for TxPoolActor {
     type Result = actix::MessageResult<RemoveTxn>;
 
     fn handle(&mut self, msg: RemoveTxn, _ctx: &mut Self::Context) -> Self::Result {
+        trace!("txpool_actor:remove_txn:start");
+        trace_time!("txpool_actor:remove_txn");
+
         let RemoveTxn {
             txn_hash,
             is_invalid,
@@ -295,6 +306,9 @@ impl actix::Handler<GetPendingTxns> for TxPoolActor {
     type Result = actix::MessageResult<GetPendingTxns>;
 
     fn handle(&mut self, msg: GetPendingTxns, _ctx: &mut Self::Context) -> Self::Result {
+        trace!("txpool_actor:ge_pendings:start");
+        trace_time!("txpool_actor:get_pendings");
+
         let GetPendingTxns { max_len } = msg;
         let result = self.get_pending(max_len);
         actix::MessageResult(result)
@@ -310,6 +324,9 @@ impl actix::Handler<SubscribeTxns> for TxPoolActor {
     type Result = actix::MessageResult<SubscribeTxns>;
 
     fn handle(&mut self, _: SubscribeTxns, _ctx: &mut Self::Context) -> Self::Result {
+        trace!("txpool_actor:subscribe_txn:start");
+        trace_time!("txpool_actor:subscribe_txn");
+
         let result = {
             let (tx, rx) = mpsc::unbounded();
             self.queue.add_full_listener(tx);
@@ -330,6 +347,9 @@ impl actix::Handler<ChainNewBlock> for TxPoolActor {
     type Result = <ChainNewBlock as actix::Message>::Result;
 
     fn handle(&mut self, msg: ChainNewBlock, _ctx: &mut Self::Context) -> Self::Result {
+        trace!("txpool_actor:chain_new_block:start");
+        trace_time!("txpool_actor:chain_new_block");
+
         let ChainNewBlock { enacted, retracted } = msg;
 
         info!(

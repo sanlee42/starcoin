@@ -46,7 +46,7 @@ pub fn mint<H, C>(
     miner_account: WalletAccount,
     txns: Vec<SignedUserTransaction>,
     chain: &dyn ChainReader,
-    arbiter: Arbiter,
+    // arbiter: Arbiter,
 ) -> anyhow::Result<()>
 where
     H: ConsensusHeader,
@@ -67,6 +67,7 @@ where
             error!("Stratum push failed:{:?}", e);
         }
     };
-    arbiter.send(Box::pin(fut));
+    actix::spawn(fut);
+    // arbiter.send(Box::pin(fut));
     Ok(())
 }

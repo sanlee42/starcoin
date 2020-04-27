@@ -123,8 +123,14 @@ impl CommandAction for GenTxnCommand {
                 opt.amount,
             );
             gen_result.total_amount += opt.amount;
-            let txn = client.wallet_sign_txn(raw_txn)?;
-            let result = client.submit_transaction(txn.clone())?;
+            let txn = {
+                trace_time!("client:debug:gen_txn:sign_txn");
+                client.wallet_sign_txn(raw_txn)?
+            };
+            let result = {
+                trace_time!("client:debug:gen_txn:submit_txn");
+                client.submit_transaction(txn.clone())?
+            };
             if result {
                 gen_result.submit_success += 1;
             } else {

@@ -4897,6 +4897,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4fd5641d01c8f18a23da7b6fe29298ff4b55afcccdf78973b24cf3175fee32e"
 
 [[package]]
+name = "perf-timer"
+version = "0.1.0"
+dependencies = [
+ "log 0.4.8",
+]
+
+[[package]]
 name = "petgraph"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6206,6 +6213,7 @@ dependencies = [
  "starcoin-wallet-api",
  "stdlib 0.1.0",
  "structopt",
+ "trace-time",
  "vm",
 ]
 
@@ -6314,6 +6322,7 @@ dependencies = [
  "starcoin-vm-runtime",
  "stdlib 0.1.0",
  "stest",
+ "trace-time",
 ]
 
 [[package]]
@@ -6610,6 +6619,7 @@ dependencies = [
  "tokio 0.1.22",
  "tokio 0.2.18",
  "tokio-compat",
+ "trace-time",
 ]
 
 [[package]]
@@ -6675,6 +6685,7 @@ dependencies = [
  "stest",
  "thiserror",
  "tokio 0.1.22",
+ "trace-time",
 ]
 
 [[package]]
@@ -6906,6 +6917,7 @@ dependencies = [
  "starcoin-crypto",
  "starcoin-executor",
  "starcoin-genesis",
+ "starcoin-logger",
  "starcoin-state-api",
  "starcoin-state-tree",
  "starcoin-statedb",
@@ -7040,6 +7052,7 @@ dependencies = [
  "starcoin-wallet-api",
  "stest",
  "tempfile",
+ "trace-time",
 ]
 
 [[package]]
@@ -7987,9 +8000,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-futures"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58b0b7fd92dc7b71f29623cc6836dd7200f32161a2313dd78be233a8405694f6"
+checksum = "ab7bb6f14721aa00656086e9335d363c5c8747bae02ebe32ea2c7dece5689b4c"
 dependencies = [
  "pin-project",
  "tracing",

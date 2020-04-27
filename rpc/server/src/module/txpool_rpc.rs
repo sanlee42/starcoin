@@ -1,14 +1,16 @@
 // Copyright (c) The Starcoin Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::module::map_err;
 use futures::future::TryFutureExt;
+use futures::FutureExt;
+use starcoin_logger::prelude::*;
+/// Re-export the API
+pub use starcoin_rpc_api::txpool::*;
 use starcoin_rpc_api::{txpool::TxPoolApi, FutureResult};
 use starcoin_txpool_api::TxPoolAsyncService;
 use starcoin_types::transaction::SignedUserTransaction;
-
-use crate::module::map_err;
-/// Re-export the API
-pub use starcoin_rpc_api::txpool::*;
+use tracing;
 
 pub struct TxPoolRpcImpl<S>
 where
@@ -31,7 +33,20 @@ where
     S: TxPoolAsyncService,
 {
     fn submit_transaction(&self, txn: SignedUserTransaction) -> FutureResult<bool> {
-        let fut = self.service.clone().add(txn).map_err(map_err);
+        let timer = trace_time::PerfTimer::new("txpool_rpc:submit_transaction");
+        let mut fut = self.service.clone().add(txn).map_err(map_err);
+        let fut = async move {
+            let _outer_timer = timer;
+            let _inner_timer = trace_time::PerfTimer::new("txpool_rpc:submit_transaction_inner");
+            trace!("txpool_rpc:submit_transaction_inner:start");
+            let fut = futures::future::poll_fn(|ctx| {
+                trace!("txpool_rpc:submit_transaction_inner:poll");
+                fut.poll_unpin(ctx)
+            });
+            let result = fut.await;
+            result
+        };
+        let fut = Box::pin(fut);
         Box::new(fut.compat())
     }
 }

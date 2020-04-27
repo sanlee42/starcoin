@@ -3,7 +3,7 @@
 
 use crate::message::{WalletRequest, WalletResponse};
 use crate::service::WalletServiceImpl;
-use actix::{Actor, Addr, Context, Handler};
+use actix::{Actor, Addr, Arbiter, Context, Handler};
 use anyhow::Result;
 use starcoin_config::NodeConfig;
 use starcoin_types::account_address::AccountAddress;

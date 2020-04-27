@@ -172,6 +172,7 @@ where
                 storage.clone(),
                 txpool.clone(),
             )?;
+
             let block_chain = BlockChain::<C, S, P>::new(
                 config.clone(),
                 master,
@@ -179,15 +180,7 @@ where
                 txpool,
                 Arc::downgrade(&collection),
             )?;
-            mint::<H, C>(
-                stratum,
-                miner,
-                config,
-                miner_account,
-                txns,
-                &block_chain,
-                arbiter,
-            )?;
+            mint::<H, C>(stratum, miner, config, miner_account, txns, &block_chain)?;
             drop(block_chain);
             drop(collection);
             Ok(())
@@ -196,9 +189,10 @@ where
             if let Err(err) = result {
                 error!("Failed to process generate block event:{:?}", err)
             }
-        })
-        .into_actor(self);
-        ctx.spawn(f);
+        });
+        // .into_actor(self);
+        arbiter.send(Box::pin(f));
+        // ctx.spawn(f);
         Ok(())
     }
 }

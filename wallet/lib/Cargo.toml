@@ -15,6 +15,7 @@ actix = "0.9"
 actix-rt = "1.0"
 async-trait = "0.1"
 rand="0.6"
+trace-time = "0.1"
 starcoin-logger = {path = "../../commons/logger"}
 stest = {path = "../../commons/stest"}
 wallet-api = {path = "../api",package = "starcoin-wallet-api"}
