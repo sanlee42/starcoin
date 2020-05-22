@@ -4,7 +4,7 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-name: Upload Release Asset
+name: Build release
 
 jobs:
   build:
@@ -26,14 +26,14 @@ jobs:
           override: true
       - name: setup environment
         run: bash ./scripts/dev_setup.sh
-      - name: build for linux
+      - name: build for ${{ matrix.platform }}
         uses: actions-rs/cargo@v1
         env:
           RUSTFLAGS: -Clink-arg=-Wl,--no-keep-memory,-fuse-ld=gold,--no-map-whole-files
         with:
           command: build
-          args: --release --all --feature final
-      - name: Create Release
+          args: --release --all
+      - name: create release
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -42,9 +42,15 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           draft: false
-          prerelease: false
-      - name: upload artifact
-          uses: actions/upload-artifact@v1
-          with:
-            name: ${{matrix.platform}}.artifacts.zip
-            path: target/release/
+      - name: build asset
+        run: bash ./scripts/release.sh ${{ matrix.platform }}
+      - name: upload release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./starcoin-${{ matrix.platform }}.tar.gz
+          asset_name: starcoin-${{ matrix.platform }}.tar.gz
+          asset_content_type: application/gzip
