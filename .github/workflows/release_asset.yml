@@ -25,11 +25,6 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: .\scripts\install_llvm.ps1
         shell: powershell
-      - name: build for ${{ matrix.platform }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --all
       - name: build release asset
         run: bash ./scripts/release.sh ${{ matrix.platform }}
       - name: upload release asset
