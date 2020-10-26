@@ -41,10 +41,6 @@ pub mod generate_summaries {
 pub mod installer {
     pub use libra_x::installer::*;
 }
-#[cfg(not(windows))]
-pub mod lint {
-    pub use libra_x::lint::*;
-}
 pub mod test;
 
 pub mod cargo;
@@ -95,9 +91,6 @@ enum Command {
     #[structopt(name = "tools")]
     /// Run tests
     Tools(tools::Args),
-    #[structopt(name = "lint")]
-    /// Run lints
-    Lint(lint::Args),
     #[structopt(name = "generate-summaries")]
     /// Generate build summaries for important subsets
     GenerateSummaries(generate_summaries::Args),
@@ -130,9 +123,6 @@ fn main() -> Result<()> {
 
     let args = Args::from_args();
     let xctx = context::XContext::new()?;
-    // let config = libra_x::config::Config::from_file("./x.toml")?;
-    // let xctx = context::XContext::with_config(config);
-    // dbg!(xctx.config());
     match args.cmd {
         Command::Tools(args) => tools::run(args, xctx),
         Command::Test(args) => test::run(args, xctx),
@@ -141,7 +131,6 @@ fn main() -> Result<()> {
         Command::Fix(args) => fix::run(args, xctx),
         Command::Fmt(args) => fmt::run(args, xctx),
         Command::Bench(args) => bench::run(args, xctx),
-        Command::Lint(args) => lint::run(args, xctx),
         Command::GenerateSummaries(args) => generate_summaries::run(args, xctx),
         Command::DiffSummary(args) => diff_summary::run(args, xctx),
     }
