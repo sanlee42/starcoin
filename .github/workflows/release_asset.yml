@@ -2,7 +2,7 @@ name: Release asset bot
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 jobs:
   build:
     name: Build release asset
@@ -29,6 +29,8 @@ jobs:
         shell: powershell
       - name: build for ${{ matrix.platform }}
         uses: actions-rs/cargo@v1
+        ENV:
+          CPATH: $CPATH:"C:\msys64\include"
         with:
           command: build
           args: --release --all
