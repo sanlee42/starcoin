@@ -6,3 +6,4 @@ $exePath = "$env:temp\LLVM-$llvmVersion-win64.exe"
 Write-Host "Installing..."
 cmd /c start /wait $exePath /S
 Write-Host "Installed" -ForegroundColor Green
+pacman -Sy msys2-runtime-devel
