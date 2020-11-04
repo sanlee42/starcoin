@@ -11,7 +11,7 @@ use types::{
 };
 
 pub struct MintTask {
-    pub(crate) mining_hash: HashValue,
+    pub(crate) mining_hash: Vec<u8>,
     block_template: BlockTemplate,
     difficulty: U256,
     metrics_timer: HistogramTimer,
@@ -19,13 +19,13 @@ pub struct MintTask {
 
 impl MintTask {
     pub fn new(block_template: BlockTemplate, difficulty: U256) -> MintTask {
-        let mining_hash = block_template.as_raw_block_header(difficulty).crypto_hash();
+        let mining_blob = block_template.as_pow_header_blob(difficulty);
         let metrics_timer = MINER_METRICS
             .block_mint_time
             .with_label_values(&["mint"])
             .start_timer();
         MintTask {
-            mining_hash,
+            mining_hash: mining_blob,
             block_template,
             difficulty,
             metrics_timer,

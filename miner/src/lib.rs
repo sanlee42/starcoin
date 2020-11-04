@@ -68,7 +68,7 @@ impl ActorService for MinerService {
 impl EventHandler<Self, SubmitSealEvent> for MinerService {
     fn handle_event(&mut self, event: SubmitSealEvent, ctx: &mut ServiceContext<MinerService>) {
         if let Err(e) = self.finish_task(event.nonce, event.header_hash, ctx) {
-            error!("Process SubmitSealEvent {:?} fail: {:?}", event, e);
+            debug!("Process SubmitSealEvent {:?} fail: {:?}", event, e);
         }
     }
 }
@@ -98,7 +98,7 @@ impl MinerService {
                 .strategy()
                 .calculate_next_difficulty(&block_chain, &epoch)?;
             let task = MintTask::new(block_template, difficulty);
-            let mining_hash = task.mining_hash;
+            let mining_hash = task.mining_hash.clone();
             if self.is_minting() {
                 warn!("force set mint task, since mint task is not empty");
             }
@@ -125,6 +125,7 @@ impl MinerService {
                 header_hash
             )
         })?;
+        /*
         if task.mining_hash != header_hash {
             warn!(
                 "Header hash mismatch expect: {:?}, got: {:?}, probably received old job result.",
@@ -132,7 +133,7 @@ impl MinerService {
             );
             self.current_task = Some(task);
             return Ok(());
-        }
+        } */
         let block = task.finish(nonce);
         info!("Mint new block: {}", block);
         ctx.broadcast(MinedBlock(Arc::new(block)));

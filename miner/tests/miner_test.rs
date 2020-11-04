@@ -21,8 +21,9 @@ use types::{
     system_events::{GenerateBlockEvent, MintBlockEvent, NewHeadBlock, SubmitSealEvent},
     U256,
 };
-
+/*
 #[stest::test]
+#[ignore]
 fn test_miner() {
     let mut config = NodeConfig::random_for_test();
     config.miner.enable_miner_client = false;
@@ -118,4 +119,4 @@ async fn test_miner_service() {
         .unwrap();
 
     registry.shutdown_system().await.unwrap();
-}
+}*/

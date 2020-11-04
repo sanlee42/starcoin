@@ -21,10 +21,12 @@ pub fn cryptonight_r(data: &[u8], size: usize) -> Vec<u8> {
     let hash: Vec<i8> = vec![0i8; 32];
     let data_ptr: *const c_void = data.as_ptr() as *const c_void;
     let hash_ptr: *const c_char = hash.as_ptr() as *const c_char;
-    unsafe {
+    let mut hash = unsafe {
         cn_slow_hash(data_ptr, size, hash_ptr, VARIANT, PREHASHED, HEIGHT);
         std::mem::transmute::<Vec<i8>, Vec<u8>>(hash)
-    }
+    };
+    hash.reverse();
+    hash
 }
 
 #[cfg(test)]
@@ -32,6 +34,8 @@ mod tests {
     use super::*;
     use rustc_serialize as serialize;
     use serialize::hex::FromHex;
+    use std::io::{repeat, Read};
+    use std::iter;
 
     struct TestCase {
         input: Vec<u8>,

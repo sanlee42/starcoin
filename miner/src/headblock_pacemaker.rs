@@ -6,6 +6,7 @@ use anyhow::Result;
 use logger::prelude::*;
 use starcoin_service_registry::{ActorService, EventHandler, ServiceContext};
 use types::system_events::NewHeadBlock;
+use actix::clock::Duration;
 
 /// HeadBlockPacemaker, only generate block when new HeadBlock publish.
 #[derive(Default)]
@@ -13,6 +14,7 @@ pub struct HeadBlockPacemaker {}
 
 impl HeadBlockPacemaker {
     pub fn send_event(&mut self, ctx: &mut ServiceContext<Self>) {
+        std::thread::sleep(Duration::from_secs(5));
         ctx.broadcast(GenerateBlockEvent::new(true));
     }
 }

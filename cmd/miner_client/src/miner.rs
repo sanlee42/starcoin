@@ -16,39 +16,48 @@ use starcoin_types::system_events::MintBlockEvent;
 use starcoin_types::U256;
 use std::sync::Mutex;
 use std::thread;
+use usbderive::derive::{Config as DeriveConfig, UsbDerive};
+use consensus::{difficult_to_target, target_to_difficulty};
+use std::io::Cursor;
+use byteorder::{ReadBytesExt, BigEndian};
+use std::convert::TryInto;
 
 pub struct MinerClient<C: JobClient> {
     nonce_rx: Option<mpsc::UnboundedReceiver<(Vec<u8>, u64)>>,
-    worker_controller: WorkerController,
     job_client: C,
     pb: Option<ProgressBar>,
     num_seals_found: Mutex<u64>,
+    derive: UsbDerive,
 }
 
 impl<C: JobClient> MinerClient<C> {
     pub fn new(config: MinerClientConfig, job_client: C) -> Result<Self> {
         let (nonce_tx, nonce_rx) = mpsc::unbounded();
-        let (worker_controller, pb) = if config.enable_stderr {
+        let pb = if config.enable_stderr {
             let mp = MultiProgress::new();
             let pb = mp.add(ProgressBar::new(10));
             pb.set_style(ProgressStyle::default_bar().template("{msg:.green}"));
-            let worker_controller =
-                start_worker(&config, nonce_tx, Some(&mp), job_client.time_service());
+
             thread::spawn(move || {
                 mp.join().expect("MultiProgress join failed");
             });
-            (worker_controller, Some(pb))
-        } else {
-            let worker_controller =
-                start_worker(&config, nonce_tx, None, job_client.time_service());
-            (worker_controller, None)
-        };
+            Some(pb)
+        } else { None };
+
+        let path = "/dev/cu.usbmodem2065325550561";
+        let mut derive = UsbDerive::open(path, DeriveConfig::default()).expect("Must open serial port");
+        derive.set_hw_params();
+        derive.set_opcode()?;
+        derive.get_state()?;
+        let mut derive_clone = derive.clone();
+        thread::spawn(move || { derive_clone.process_seal(nonce_tx) });
+
         Ok(Self {
             nonce_rx: Some(nonce_rx),
-            worker_controller,
             job_client,
             pb,
             num_seals_found: Mutex::new(0),
+            derive,
         })
     }
     fn submit_seal(&self, pow_hash: HashValue, nonce: u64) {
@@ -71,12 +80,13 @@ impl<C: JobClient> MinerClient<C> {
         }
     }
 
-    fn start_mint_work(&self, strategy: ConsensusStrategy, minting_hash: HashValue, diff: U256) {
-        block_on(self.worker_controller.send_message(WorkerMessage::NewWork {
-            strategy,
-            minting_hash,
-            diff,
-        }))
+    fn start_mint_work(&mut self, strategy: ConsensusStrategy, minting_hash: Vec<u8>, diff: U256) {
+        let target = difficult_to_target(diff);
+        let t: HashValue = target.into();
+        let mut data = Cursor::new(t.to_vec());
+        let d_target = data.read_u32::<BigEndian>().unwrap();
+        let input_data = minting_hash.as_slice();
+        self.derive.set_job(0x1, d_target, &input_data).unwrap();
     }
 }
 

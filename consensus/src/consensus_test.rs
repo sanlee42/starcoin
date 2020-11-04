@@ -5,7 +5,7 @@ use crate::consensus::Consensus;
 use crate::difficulty::{get_next_target_helper, BlockDiffInfo};
 use crate::{difficult_to_target, set_header_nonce, target_to_difficulty, ARGON, CRYPTONIGHT};
 use proptest::{collection::vec, prelude::*};
-use starcoin_crypto::hash::PlainCryptoHash;
+use starcoin_crypto::hash::{PlainCryptoHash, TestOnlyHash};
 use starcoin_crypto::HashValue;
 use starcoin_types::block::{BlockHeader, RawBlockHeader};
 use starcoin_types::U256;
@@ -13,6 +13,10 @@ use starcoin_vm_types::time::{
     duration_since_epoch, MockTimeService, TimeService, TimeServiceType,
 };
 use std::collections::VecDeque;
+use std::ops::{Div, DivAssign};
+use byteorder::{ReadBytesExt, BigEndian};
+use std::io::Cursor;
+
 
 #[stest::test]
 fn raw_hash_test() {
@@ -34,11 +38,10 @@ fn raw_hash_test() {
 fn verify_header_test() {
     let mut header = BlockHeader::random();
     header.difficulty = 1.into();
-    let raw_header: RawBlockHeader = header.clone().into();
     let time_service = TimeServiceType::RealTimeService.new_time_service();
     let nonce = CRYPTONIGHT.solve_consensus_nonce(
-        raw_header.crypto_hash(),
-        raw_header.difficulty,
+        &header.as_pow_header_blob(),
+        header.difficulty,
         time_service.as_ref(),
     );
     header.nonce = nonce;
@@ -79,26 +82,17 @@ fn simulate_blocks(time_plan: u64, init_difficulty: U256) -> u64 {
     blocks[0].timestamp - blocks[1].timestamp
 }
 
-proptest! {
-    #![proptest_config(ProptestConfig::with_cases(10))]
 
-    #[test]
-    fn test_calculate_hash(
-        hashes in any::<HashValue> (),
-        nonce in any::<u64>()) {
-            let result = ARGON.calculate_pow_hash(hashes, nonce);
-            assert!(result.is_ok());
-    }
+#[test]
+fn target() {
+    let target = difficult_to_target(2.into());
+    let mut b = [0u8; 32];
+    target.to_big_endian(b.as_mut());
 
-    #[test]
-    fn test_set_header_nonce(
-        header in vec(any::<u8>(), 0..256),
-        nonce in any::<u64>()) {
-            let input = set_header_nonce(header.to_vec().as_slice(), nonce);
-            if header.len() > 7 {
-                assert!(!input.is_empty());
-            }else {
-                assert!(input.is_empty());
-        }
+    let mut data = Cursor::new(b);
+    let d_target = data.read_u32::<BigEndian>().unwrap();
+    println!("{:#x},", d_target);
+    for i in b.iter(){
+        print!("{:#x},",i)
     }
 }

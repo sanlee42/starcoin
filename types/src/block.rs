@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 use starcoin_accumulator::accumulator_info::AccumulatorInfo;
 use starcoin_crypto::hash::ACCUMULATOR_PLACEHOLDER_HASH;
 use starcoin_vm_types::transaction::authenticator::AuthenticationKey;
+use std::hash::Hash;
 
 /// Type for block number.
 pub type BlockNumber = u64;
@@ -116,6 +117,19 @@ impl BlockHeader {
             body_hash,
             chain_id,
         }
+    }
+
+    pub fn as_pow_header_blob(&self) -> Vec<u8> {
+        let mut blob = Vec::new();
+        let raw_header: RawBlockHeader = self.to_owned().into();
+        let raw_header_hash = raw_header.crypto_hash();
+        let mut diff_bytes = [0u8;32];
+        raw_header.difficulty.to_big_endian(&mut diff_bytes);
+        let extend_and_nonce = [0u8; 12];
+        blob.extend_from_slice(raw_header_hash.to_vec().as_slice());
+        blob.extend_from_slice(&extend_and_nonce);
+        blob.extend_from_slice(&mut diff_bytes);
+        blob
     }
 
     pub fn id(&self) -> HashValue {
@@ -266,7 +280,7 @@ pub struct RawBlockHeader {
 }
 
 #[derive(
-    Default, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash,
+Default, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash,
 )]
 pub struct BlockBody {
     /// The transactions in this block.
@@ -325,8 +339,8 @@ pub struct Block {
 
 impl Block {
     pub fn new<B>(header: BlockHeader, body: B) -> Self
-    where
-        B: Into<BlockBody>,
+        where
+            B: Into<BlockBody>,
     {
         Block {
             header,
@@ -600,7 +614,21 @@ impl BlockTemplate {
             chain_id: self.chain_id,
         }
     }
-
+    
+    pub fn as_pow_header_blob(&self, difficulty: U256) -> Vec<u8> {
+        let mut blob = Vec::new();
+        let raw_header = self.as_raw_block_header(difficulty);
+        let raw_header_hash = raw_header.crypto_hash();
+        let mut dh  = [0u8;32];
+        difficulty.to_big_endian(&mut dh);
+        let extend_and_nonce = [0u8; 12];
+        
+        blob.extend_from_slice(raw_header_hash.to_vec().as_slice());
+        blob.extend_from_slice(&extend_and_nonce);
+        blob.extend_from_slice(&mut dh);
+        blob
+    }
+    
     pub fn into_block_header(self, nonce: u64, difficulty: U256) -> BlockHeader {
         BlockHeader::new_with_auth(
             self.parent_hash,

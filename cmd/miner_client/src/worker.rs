@@ -63,7 +63,7 @@ pub enum WorkerMessage {
     Stop,
     NewWork {
         strategy: ConsensusStrategy,
-        minting_hash: HashValue,
+        minting_hash: Vec<u8>,
         diff: U256,
     },
 }
@@ -97,7 +97,7 @@ pub struct Worker {
     worker_rx: mpsc::UnboundedReceiver<WorkerMessage>,
     strategy: Option<ConsensusStrategy>,
     diff: U256,
-    minting_hash: Option<HashValue>,
+    minting_hash: Option<Vec<u8>>,
     start: bool,
     num_seal_found: u64,
 }
@@ -122,7 +122,7 @@ impl Worker {
         G: FnMut() -> u64,
         S: Fn(
             ConsensusStrategy,
-            HashValue,
+            &[u8],
             u64,
             U256,
             mpsc::UnboundedSender<(Vec<u8>, u64)>,
@@ -144,12 +144,12 @@ impl Worker {
                 break;
             }
             if self.start {
-                if let Some(minting_hash) = self.minting_hash {
+                if let Some(minting_hash) = self.minting_hash.clone() {
                     if let Some(strategy) = self.strategy {
                         hash_counter += 1;
                         if solver(
                             strategy,
-                            minting_hash,
+                            &minting_hash,
                             rng(),
                             self.diff,
                             self.nonce_tx.clone(),
@@ -217,7 +217,7 @@ impl Worker {
 
 fn solver(
     strategy: ConsensusStrategy,
-    minting_hash: HashValue,
+    minting_hash: &[u8],
     nonce: u64,
     diff: U256,
     mut nonce_tx: mpsc::UnboundedSender<(Vec<u8>, u64)>,

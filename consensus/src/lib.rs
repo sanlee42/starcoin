@@ -41,22 +41,21 @@ pub fn difficult_to_target(difficulty: U256) -> U256 {
     difficult_1_target() / difficulty
 }
 
-pub(crate) fn set_header_nonce(header: &[u8], nonce: u64) -> Vec<u8> {
-    //TODO: change function name
+pub fn set_header_nonce(header: &[u8], nonce: u64) -> Vec<u8> {
     let len = header.len();
-    if len < 8 {
+    if len != 76 {
         return vec![];
     }
     let mut header = header.to_owned();
-    header.truncate(len - 8);
-    let _ = header.write_u64::<LittleEndian>(nonce);
+
+    let _ = header[39..].as_mut().write_u32::<LittleEndian>(nonce as u32);
     header
 }
 
 static DUMMY: Lazy<DummyConsensus> = Lazy::new(DummyConsensus::new);
 static ARGON: Lazy<ArgonConsensus> = Lazy::new(ArgonConsensus::new);
 static KECCAK: Lazy<KeccakConsensus> = Lazy::new(KeccakConsensus::new);
-static CRYPTONIGHT: Lazy<CryptoNightConsensus> = Lazy::new(CryptoNightConsensus::new);
+pub static CRYPTONIGHT: Lazy<CryptoNightConsensus> = Lazy::new(CryptoNightConsensus::new);
 
 impl Consensus for ConsensusStrategy {
     fn calculate_next_difficulty(
@@ -74,7 +73,7 @@ impl Consensus for ConsensusStrategy {
 
     fn solve_consensus_nonce(
         &self,
-        mining_hash: HashValue,
+        mining_hash: &[u8],
         difficulty: U256,
         time_service: &dyn TimeService,
     ) -> u64 {
@@ -108,7 +107,7 @@ impl Consensus for ConsensusStrategy {
         }
     }
 
-    fn calculate_pow_hash(&self, mining_hash: HashValue, nonce: u64) -> Result<HashValue> {
+    fn calculate_pow_hash(&self, mining_hash: &[u8], nonce: u64) -> Result<HashValue> {
         match self {
             ConsensusStrategy::Dummy => DUMMY.calculate_pow_hash(mining_hash, nonce),
             ConsensusStrategy::Argon => ARGON.calculate_pow_hash(mining_hash, nonce),

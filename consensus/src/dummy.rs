@@ -34,7 +34,7 @@ impl Consensus for DummyConsensus {
 
     fn solve_consensus_nonce(
         &self,
-        _mining_hash: HashValue,
+        _mining_hash: &[u8],
         difficulty: U256,
         time_service: &dyn TimeService,
     ) -> u64 {
@@ -60,7 +60,7 @@ impl Consensus for DummyConsensus {
         Ok(())
     }
 
-    fn calculate_pow_hash(&self, _mining_hash: HashValue, _nonce: u64) -> Result<HashValue> {
+    fn calculate_pow_hash(&self, _mining_hash: &[u8], _nonce: u64) -> Result<HashValue> {
         unreachable!()
     }
 }

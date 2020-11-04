@@ -64,12 +64,12 @@ impl GenerateBlockEvent {
 #[rtype(result = "Result<()>")]
 pub struct MintBlockEvent {
     pub strategy: ConsensusStrategy,
-    pub minting_hash: HashValue,
+    pub minting_hash: Vec<u8>,
     pub difficulty: U256,
 }
 
 impl MintBlockEvent {
-    pub fn new(strategy: ConsensusStrategy, minting_hash: HashValue, difficulty: U256) -> Self {
+    pub fn new(strategy: ConsensusStrategy, minting_hash: Vec<u8>, difficulty: U256) -> Self {
         Self {
             strategy,
             minting_hash,

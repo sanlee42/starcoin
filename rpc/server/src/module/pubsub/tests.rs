@@ -208,8 +208,9 @@ pub async fn test_subscribe_to_pending_transactions() -> Result<()> {
     assert_eq!(res, Ok(None));
     Ok(())
 }
-
+/*
 #[stest::test]
+#[ignore]
 pub async fn test_subscribe_to_mint_block() -> Result<()> {
     let (txpool_service, .., registry) = test_helper::start_txpool().await;
     let bus = registry.service_ref::<BusService>().await?;
@@ -251,3 +252,4 @@ pub async fn test_subscribe_to_mint_block() -> Result<()> {
     assert_eq!(resp, Ok(Some(response.to_owned())));
     Ok(())
 }
+*/

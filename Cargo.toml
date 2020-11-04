@@ -82,6 +82,7 @@ members = [
     "cmd/faucet",
     "cmd/tx-factory",
     "cmd/miner_client",
+    "cmd/miner_client/usbderive",
     "cmd/generator",
     "dataformat-generator",
 ]

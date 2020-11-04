@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
       - name: starcoin
-        image: starcoin/starcoin:v0.6.0
+        image: starcoin/starcoin:v0.7.1
         imagePullPolicy: Always
         command:
           - bash
@@ -82,13 +82,13 @@ spec:
                 name: starcoin-config
                 key: start_disable_seed_node
       - name: txfactory
-        image: starcoin/starcoin:v0.6.0
+        image: starcoin/starcoin:v0.7.1
         imagePullPolicy: IfNotPresent
         command:
           - bash
           - -c
         args:
-          - /starcoin/starcoin_txfactory --ipc-path /data/proxima/starcoin.ipc
+          - /starcoin/starcoin_txfactory --ipc-path /data/proxima/starcoin.ipc --stress
         volumeMounts:
         - name: volume
           mountPath: /data
