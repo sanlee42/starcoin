@@ -4538,7 +4538,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.11.0",
  "peerset",
- "pin-project 0.4.27",
+ "pin-project 1.0.1",
  "prometheus",
  "prost",
  "rand 0.7.3",
