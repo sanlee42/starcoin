@@ -3,10 +3,9 @@
 
 use crate::consensus::Consensus;
 use crate::difficulty::{get_next_target_helper, BlockDiffInfo};
-use crate::{difficult_to_target, set_header_nonce, target_to_difficulty, ARGON, CRYPTONIGHT};
+use crate::{difficult_to_target, set_header_nonce, target_to_difficulty, CRYPTONIGHT};
 use proptest::{collection::vec, prelude::*};
 use starcoin_crypto::hash::PlainCryptoHash;
-use starcoin_crypto::HashValue;
 use starcoin_types::block::{BlockHeader, RawBlockHeader};
 use starcoin_types::U256;
 use starcoin_vm_types::time::{
@@ -37,7 +36,7 @@ fn verify_header_test() {
     let raw_header: RawBlockHeader = header.clone().into();
     let time_service = TimeServiceType::RealTimeService.new_time_service();
     let nonce = CRYPTONIGHT.solve_consensus_nonce(
-        raw_header.crypto_hash(),
+        &header.as_pow_header_blob(),
         raw_header.difficulty,
         time_service.as_ref(),
     );
@@ -83,17 +82,9 @@ proptest! {
     #![proptest_config(ProptestConfig::with_cases(10))]
 
     #[test]
-    fn test_calculate_hash(
-        hashes in any::<HashValue> (),
-        nonce in any::<u64>()) {
-            let result = ARGON.calculate_pow_hash(hashes, nonce);
-            assert!(result.is_ok());
-    }
-
-    #[test]
     fn test_set_header_nonce(
         header in vec(any::<u8>(), 0..256),
-        nonce in any::<u64>()) {
+        nonce in any::<u32>()) {
             let input = set_header_nonce(header.to_vec().as_slice(), nonce);
             if header.len() > 7 {
                 assert!(!input.is_empty());
