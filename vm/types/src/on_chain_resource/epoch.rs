@@ -7,9 +7,10 @@ use crate::move_resource::MoveResource;
 use move_core_types::language_storage::{StructTag, CORE_CODE_ADDRESS};
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
+use schemars::JsonSchema;
 
 /// The Epoch resource held under an account.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct Epoch {
     number: u64,
     //milli_seconds
@@ -123,7 +124,7 @@ impl MoveResource for Epoch {
     const STRUCT_NAME: &'static str = "Epoch";
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EpochInfo {
     epoch: Epoch,
     epoch_data: EpochData,
@@ -181,7 +182,7 @@ impl EpochInfo {
 }
 
 /// The Epoch data resource held under an account.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EpochData {
     uncles: u64,
     total_reward: u128,

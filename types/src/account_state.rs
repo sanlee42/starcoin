@@ -11,7 +11,7 @@ use starcoin_crypto::{
 };
 use std::convert::{TryFrom, TryInto};
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize, CryptoHasher, CryptoHash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize, CryptoHasher, CryptoHash,schemars::JsonSchema)]
 pub struct AccountState {
     storage_roots: Vec<Option<HashValue>>,
 }

@@ -57,8 +57,9 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use starcoin_crypto::hash::HashValue;
 use std::fmt;
 use std::str::FromStr;
+use schemars::JsonSchema;
 
-#[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
+#[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd, JsonSchema)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 pub struct AccessPath {
     pub address: AccountAddress,
@@ -109,8 +110,8 @@ impl AccessPath {
 
 impl Serialize for AccessPath {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         if serializer.is_human_readable() {
             serializer.serialize_str(self.to_string().as_str())
@@ -122,8 +123,8 @@ impl Serialize for AccessPath {
 
 impl<'de> Deserialize<'de> for AccessPath {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         if deserializer.is_human_readable() {
             let s = <String>::deserialize(deserializer)?;
@@ -184,18 +185,18 @@ impl From<&ResourceKey> for AccessPath {
 }
 
 #[derive(
-    IntoPrimitive,
-    TryFromPrimitive,
-    Clone,
-    Copy,
-    Eq,
-    PartialEq,
-    Hash,
-    Serialize,
-    Deserialize,
-    Ord,
-    PartialOrd,
-    Debug,
+IntoPrimitive,
+TryFromPrimitive,
+Clone,
+Copy,
+Eq,
+PartialEq,
+Hash,
+Serialize,
+Deserialize,
+Ord,
+PartialOrd,
+Debug,
 )]
 #[repr(u8)]
 pub enum DataType {
@@ -241,7 +242,7 @@ impl Arbitrary for DataType {
 
 pub type ModuleName = Identifier;
 
-#[derive(Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, Debug)]
+#[derive(Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, Debug, schemars::JsonSchema)]
 pub enum DataPath {
     Code(ModuleName),
     Resource(StructTag),
@@ -268,7 +269,7 @@ impl Arbitrary for DataPath {
                     }
                 )),
         ]
-        .boxed()
+            .boxed()
     }
 
     type Strategy = BoxedStrategy<Self>;

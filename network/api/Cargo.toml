@@ -22,3 +22,4 @@ bcs-ext = { package = "bcs-ext", path = "../../commons/bcs_ext" }
 starcoin-service-registry = { path = "../../commons/service-registry" }
 network-rpc-core = { path = "../../network-rpc/core" }
 network-p2p-types = {path = "../../network-p2p/types"}
+schemars="0.8.0"

@@ -5,20 +5,23 @@ use bcs_ext::Sample;
 use serde::{Deserialize, Serialize};
 use serde_helpers::{deserialize_binary, serialize_binary};
 use std::fmt;
+use schemars::JsonSchema;
 
-#[derive(Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Module {
     #[serde(
-        deserialize_with = "deserialize_binary",
-        serialize_with = "serialize_binary"
+    deserialize_with = "deserialize_binary",
+    serialize_with = "serialize_binary"
     )]
     code: Vec<u8>,
 }
+
 impl From<Module> for Vec<u8> {
     fn from(m: Module) -> Self {
         m.code
     }
 }
+
 impl Module {
     pub fn new(code: Vec<u8>) -> Module {
         Module { code }
@@ -51,7 +54,7 @@ impl Sample for Module {
             code: hex::decode(
                 "a11ceb0b01000000030100020702020804100000014d0000000000000000000000000000000100",
             )
-            .expect("decode sample module should success"),
+                .expect("decode sample module should success"),
         }
     }
 }

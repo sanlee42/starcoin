@@ -16,9 +16,10 @@ use std::str::FromStr;
 pub use network_p2p_types::multiaddr::Multiaddr;
 use network_p2p_types::multihash::Error;
 pub use network_p2p_types::multihash::Multihash;
+use schemars::JsonSchema;
 
-#[derive(Eq, PartialEq, Hash, Clone, Debug)]
-pub struct PeerId(network_p2p_types::PeerId);
+#[derive(Eq, PartialEq, Hash, Clone, Debug, JsonSchema)]
+pub struct PeerId(#[schemars(with = "String")]network_p2p_types::PeerId);
 
 impl PeerId {
     pub fn new(peer_id: network_p2p_types::PeerId) -> Self {
@@ -111,8 +112,8 @@ impl FromStr for PeerId {
 
 impl<'de> Deserialize<'de> for PeerId {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         if deserializer.is_human_readable() {
             //note: if use &str at here, json rpc raise a error: invalid type: string "xx", expected a borrowed string
@@ -131,8 +132,8 @@ impl<'de> Deserialize<'de> for PeerId {
 
 impl Serialize for PeerId {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         if serializer.is_human_readable() {
             self.0.to_base58().serialize(serializer)

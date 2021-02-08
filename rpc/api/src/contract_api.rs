@@ -9,7 +9,7 @@ use crate::FutureResult;
 use starcoin_vm_types::account_address::AccountAddress;
 use starcoin_vm_types::language_storage::{ModuleId, StructTag};
 
-#[rpc]
+#[rpc(client, server, schema)]
 pub trait ContractApi {
     /// get code of module
     #[rpc(name = "contract.get_code")]
@@ -29,4 +29,11 @@ pub trait ContractApi {
 
     #[rpc(name = "contract.dry_run")]
     fn dry_run(&self, txn: DryRunTransactionRequest) -> FutureResult<TransactionOutputView>;
+}
+
+#[test]
+fn test() {
+    let schema = rpc_impl_ContractApi::gen_client::Client::gen_schema();
+    let j = serde_json::to_string_pretty(&schema).unwrap();
+    println!("{}", j);
 }

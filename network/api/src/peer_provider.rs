@@ -82,7 +82,7 @@ impl From<PeerInfo> for PeerDetail {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize,schemars::JsonSchema)]
 pub enum PeerStrategy {
     Random,
     WeightedRandom,

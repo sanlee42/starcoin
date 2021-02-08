@@ -3,6 +3,7 @@
 
 use serde::{Deserialize, Serialize};
 use starcoin_crypto::keygen::KeyGen;
+use schemars::JsonSchema;
 use starcoin_types::{
     account_address::{self, AccountAddress},
     transaction::authenticator::AuthenticationKey,
@@ -12,7 +13,7 @@ pub use starcoin_types::transaction::authenticator::{
     AccountPrivateKey, AccountPublicKey, AccountSignature,
 };
 
-#[derive(Clone, Debug, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Serialize, Deserialize, JsonSchema)]
 pub struct AccountInfo {
     //TODO should contains a unique local name?
     //name: String,

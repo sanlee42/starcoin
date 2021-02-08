@@ -24,7 +24,7 @@ use starcoin_crypto::{
     ValidCryptoMaterialStringExt,
 };
 use std::{convert::TryFrom, fmt, str::FromStr};
-
+use schemars::JsonSchema;
 /// A `TransactionAuthenticator` is an an abstraction of a signature scheme. It must know:
 /// (1) How to check its signature against a message and public key
 /// (2) How to convert its public key into an `AuthenticationKeyPreimage` structured as
@@ -56,7 +56,7 @@ impl fmt::Display for Scheme {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 pub enum TransactionAuthenticator {
     /// Single signature
     Ed25519 {
@@ -161,9 +161,10 @@ impl TransactionAuthenticator {
     PartialEq,
     PartialOrd,
     SerializeKey,
+    JsonSchema,
 )]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
-pub struct AuthenticationKey([u8; AuthenticationKey::LENGTH]);
+pub struct AuthenticationKey(#[schemars(with="String")][u8; AuthenticationKey::LENGTH]);
 
 impl AuthenticationKey {
     /// Create an authentication key from `bytes`
@@ -314,7 +315,7 @@ impl fmt::Display for AuthenticationKey {
     }
 }
 
-#[derive(Clone, Debug, Hash, PartialEq, Eq, DeserializeKey, SerializeKey)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, DeserializeKey, SerializeKey, JsonSchema)]
 pub enum AccountPublicKey {
     Single(Ed25519PublicKey),
     Multi(MultiEd25519PublicKey),

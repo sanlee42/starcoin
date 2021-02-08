@@ -11,7 +11,7 @@ use starcoin_crypto::{
 
 /// `AccumulatorInfo` is the object we store in the storage. It consists of the
 /// info that we can create MerkleAccumulator.
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash, schemars::JsonSchema)]
 pub struct AccumulatorInfo {
     /// Accumulator root hash
     pub accumulator_root: HashValue,

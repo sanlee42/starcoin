@@ -14,7 +14,7 @@ use starcoin_crypto::HashValue;
 use starcoin_types::block::BlockNumber;
 use starcoin_vm_types::on_chain_resource::{EpochInfo, GlobalTimeOnChain};
 
-#[rpc]
+#[rpc(client, server, schema)]
 pub trait ChainApi {
     #[rpc(name = "chain.id")]
     fn id(&self) -> Result<ChainId>;
@@ -38,7 +38,7 @@ pub trait ChainApi {
     /// Get chain transactions
     #[rpc(name = "chain.get_transaction")]
     fn get_transaction(&self, transaction_hash: HashValue)
-        -> FutureResult<Option<TransactionView>>;
+                       -> FutureResult<Option<TransactionView>>;
     /// Get chain transactions
     #[rpc(name = "chain.get_transaction_info")]
     fn get_transaction_info(
@@ -96,4 +96,10 @@ pub trait ChainApi {
         &self,
         number: BlockNumber,
     ) -> FutureResult<EpochUncleSummaryView>;
+}
+#[test]
+fn test() {
+    let schema = rpc_impl_ChainApi::gen_client::Client::gen_schema();
+    let j = serde_json::to_string_pretty(&schema).unwrap();
+    println!("{}", j);
 }

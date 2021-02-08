@@ -97,7 +97,7 @@ impl TaskEventCounter {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize,schemars::JsonSchema)]
 pub struct TaskProgressReport {
     pub task_name: String,
     pub sub_task: u64,

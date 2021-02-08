@@ -13,8 +13,9 @@ use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::fmt;
 use std::str::FromStr;
+use schemars::JsonSchema;
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct TokenCode {
     //Token module's address
     pub address: AccountAddress,

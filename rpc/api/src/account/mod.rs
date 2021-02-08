@@ -10,8 +10,9 @@ use starcoin_account_api::AccountInfo;
 use starcoin_types::account_address::AccountAddress;
 use starcoin_types::transaction::{RawUserTransaction, SignedUserTransaction};
 use starcoin_vm_types::token::token_code::TokenCode;
+use schemars::gen::SchemaSettings;
 
-#[rpc]
+#[rpc(client,server,schema)]
 pub trait AccountApi {
     /// Get default account
     #[rpc(name = "account.default")]
@@ -79,4 +80,11 @@ pub trait AccountApi {
 
     #[rpc(name = "account.accepted_tokens")]
     fn accepted_tokens(&self, address: AccountAddress) -> FutureResult<Vec<TokenCode>>;
+}
+
+#[test]
+fn test() {
+    let schema = rpc_impl_AccountApi::gen_client::Client::gen_schema();
+    let j = serde_json::to_string_pretty(&schema).unwrap();
+    println!("{}", j);
 }

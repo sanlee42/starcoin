@@ -22,11 +22,11 @@ log = "0.4.14"
 
 proptest = { version = "0.10.1", default-features = false, optional = true }
 proptest-derive = { version = "0.2.0", default-features = false, optional = true }
-move-core-types = { git = "https://github.com/starcoinorg/diem", rev = "b96d25b270a9b3fc1301ac56951fccb7da40dc53" }
-move-vm-types = { git = "https://github.com/starcoinorg/diem", rev = "b96d25b270a9b3fc1301ac56951fccb7da40dc53" }
-bytecode-verifier = { git = "https://github.com/starcoinorg/diem", rev = "b96d25b270a9b3fc1301ac56951fccb7da40dc53" }
-vm = { git = "https://github.com/starcoinorg/diem", rev = "b96d25b270a9b3fc1301ac56951fccb7da40dc53"}
-move-ir-types = { git = "https://github.com/starcoinorg/diem", rev = "b96d25b270a9b3fc1301ac56951fccb7da40dc53" }
+move-core-types = { git = "https://github.com/fikgol/diem", rev = "c3fc4d0f364591e51535de88c4039ed45d506a27" }
+move-vm-types = { git = "https://github.com/fikgol/diem", rev = "c3fc4d0f364591e51535de88c4039ed45d506a27" }
+bytecode-verifier = { git = "https://github.com/fikgol/diem", rev = "c3fc4d0f364591e51535de88c4039ed45d506a27" }
+vm = { git = "https://github.com/fikgol/diem", rev = "c3fc4d0f364591e51535de88c4039ed45d506a27"}
+move-ir-types = { git = "https://github.com/fikgol/diem", rev = "c3fc4d0f364591e51535de88c4039ed45d506a27" }
 
 bcs-ext = { package = "bcs-ext", path = "../../commons/bcs_ext" }
 starcoin-proptest-helpers = { path = "../../commons/proptest-helpers", optional = true }
@@ -35,11 +35,11 @@ starcoin-uint = { path = "../../types/uint" }
 starcoin-accumulator = { path = "../../core/accumulator"}
 network-p2p-types = { path = "../../network-p2p/types"}
 forkable-jellyfish-merkle = { path = "../../core/forkable-jellyfish-merkle"}
-
+schemars="0.8.0"
 [dev-dependencies]
 proptest = "0.10.1"
 proptest-derive = "0.2.0"
-vm = { git = "https://github.com/starcoinorg/diem", rev = "b96d25b270a9b3fc1301ac56951fccb7da40dc53", features = ["fuzzing"]}
+vm = { git = "https://github.com/fikgol/diem", rev = "c3fc4d0f364591e51535de88c4039ed45d506a27", features = ["fuzzing"]}
 starcoin-crypto = { path = "../../commons/crypto", features = ["fuzzing"] }
 starcoin-proptest-helpers = { path = "../../commons/proptest-helpers"}
 

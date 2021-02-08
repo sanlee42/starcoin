@@ -14,7 +14,7 @@ use std::sync::Arc;
 
 pub type TxnStatusFullEvent = Arc<[(HashValue, transaction::TxStatus)]>;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize,schemars::JsonSchema)]
 pub struct TxPoolStatus {
     pub txn_count: usize,
     pub txn_max_count: usize,

@@ -11,7 +11,7 @@ use starcoin_types::{
 pub use self::gen_client::Client as StateClient;
 use crate::types::{AccountStateSetView, StateWithProofView};
 
-#[rpc]
+#[rpc(client,server,schema)]
 pub trait StateApi {
     #[rpc(name = "state.get")]
     fn get(&self, access_path: AccessPath) -> FutureResult<Option<Vec<u8>>>;
@@ -37,4 +37,11 @@ pub trait StateApi {
         access_path: AccessPath,
         state_root: HashValue,
     ) -> FutureResult<StateWithProofView>;
+}
+
+#[test]
+fn test() {
+    let schema = rpc_impl_StateApi::gen_client::Client::gen_schema();
+    let j = serde_json::to_string_pretty(&schema).unwrap();
+    println!("{}", j);
 }
