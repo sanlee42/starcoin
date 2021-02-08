@@ -4,8 +4,9 @@
 use serde::{Deserialize, Serialize};
 use starcoin_vm_types::genesis_config::ChainNetworkID;
 use std::str::FromStr;
+use schemars;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ChainId {
     pub name: String,
     pub id: u8,
@@ -26,12 +27,13 @@ impl From<&ChainNetworkID> for ChainId {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, schemars::JsonSchema)]
 pub enum FactoryAction {
     Status,
     Stop,
     Start,
 }
+
 impl FromStr for FactoryAction {
     type Err = anyhow::Error;
 

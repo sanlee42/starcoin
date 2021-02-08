@@ -13,8 +13,8 @@ use bcs_ext::Sample;
 use serde::{Deserialize, Serialize};
 use starcoin_crypto::hash::{CryptoHash, CryptoHasher};
 use vm::errors::Location;
-
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash)]
+use schemars::JsonSchema;
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash, JsonSchema)]
 pub struct Package {
     ///Package's all Module must at same address.
     package_address: AccountAddress,

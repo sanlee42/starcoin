@@ -19,9 +19,9 @@ use std::{
 
 /// A struct that represents a globally unique id for an Event stream that a user can listen to.
 /// By design, the lower part of EventKey is the same as account address.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, schemars::JsonSchema)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
-pub struct EventKey([u8; EventKey::LENGTH]);
+pub struct EventKey(#[schemars(with = "String")][u8; EventKey::LENGTH]);
 
 impl EventKey {
     /// Construct a new EventKey from a byte array slice.
@@ -87,8 +87,8 @@ impl From<&EventKey> for [u8; EventKey::LENGTH] {
 
 impl ser::Serialize for EventKey {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: ser::Serializer,
+        where
+            S: ser::Serializer,
     {
         if serializer.is_human_readable() {
             self.to_string().serialize(serializer)
@@ -103,8 +103,8 @@ impl ser::Serialize for EventKey {
 
 impl<'de> de::Deserialize<'de> for EventKey {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: de::Deserializer<'de>,
+        where
+            D: de::Deserializer<'de>,
     {
         if deserializer.is_human_readable() {
             let s = <String>::deserialize(deserializer)?;
@@ -148,7 +148,7 @@ impl FromStr for EventKey {
 }
 
 /// A Rust representation of an Event Handle Resource.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct EventHandle {
     /// Number of events in the event stream.
     count: u64,

@@ -7,13 +7,14 @@ use move_core_types::language_storage::TypeTag;
 use serde::{Deserialize, Serialize};
 use serde_helpers::{deserialize_binary, serialize_binary};
 use std::fmt;
+use schemars::JsonSchema;
 
 /// Call a Move script.
-#[derive(Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Script {
     #[serde(
-        deserialize_with = "deserialize_binary",
-        serialize_with = "serialize_binary"
+    deserialize_with = "deserialize_binary",
+    serialize_with = "serialize_binary"
     )]
     code: Vec<u8>,
     ty_args: Vec<TypeTag>,

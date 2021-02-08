@@ -19,12 +19,13 @@ use starcoin_crypto::{
 use starcoin_vm_types::account_config::genesis_address;
 use starcoin_vm_types::transaction::authenticator::AuthenticationKey;
 use std::fmt::Formatter;
+use schemars::JsonSchema;
 
 /// Type for block number.
 pub type BlockNumber = u64;
 
 /// Type for block header extra
-#[derive(Clone, Default, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Clone, Default, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, JsonSchema)]
 pub struct BlockHeaderExtra([u8; 4]);
 
 impl BlockHeaderExtra {
@@ -47,8 +48,8 @@ impl std::fmt::Display for BlockHeaderExtra {
 
 impl<'de> Deserialize<'de> for BlockHeaderExtra {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         if deserializer.is_human_readable() {
             let s = <String>::deserialize(deserializer)?;
@@ -75,8 +76,8 @@ impl<'de> Deserialize<'de> for BlockHeaderExtra {
 
 impl Serialize for BlockHeaderExtra {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         if serializer.is_human_readable() {
             format!("0x{}", hex::encode(self.0)).serialize(serializer)
@@ -86,7 +87,7 @@ impl Serialize for BlockHeaderExtra {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Deserialize, Serialize,schemars::JsonSchema)]
 pub struct BlockIdAndNumber {
     pub id: HashValue,
     pub number: BlockNumber,
@@ -110,7 +111,7 @@ impl From<BlockHeader> for BlockIdAndNumber {
 /// block timestamp allowed future times
 pub const ALLOWED_FUTURE_BLOCKTIME: u64 = 30000; // 30 second;
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, CryptoHasher, CryptoHash)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, CryptoHasher, CryptoHash, JsonSchema)]
 pub struct BlockHeader {
     #[serde(skip)]
     id: Option<HashValue>,
@@ -133,6 +134,7 @@ pub struct BlockHeader {
     /// Gas used for contracts execution.
     gas_used: u64,
     /// Block difficulty
+    #[schemars(with = "String")]
     difficulty: U256,
     /// hash for block body
     body_hash: HashValue,
@@ -313,8 +315,8 @@ impl BlockHeader {
 
 impl<'de> Deserialize<'de> for BlockHeader {
     fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         #[derive(Deserialize)]
         #[serde(rename = "BlockHeader")]
@@ -544,7 +546,7 @@ impl BlockHeaderBuilder {
 }
 
 #[derive(
-    Default, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash,
+Default, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash,
 )]
 pub struct BlockBody {
     /// The transactions in this block.
@@ -612,8 +614,8 @@ pub struct Block {
 
 impl Block {
     pub fn new<B>(header: BlockHeader, body: B) -> Self
-    where
-        B: Into<BlockBody>,
+        where
+            B: Into<BlockBody>,
     {
         Block {
             header,
@@ -729,11 +731,12 @@ impl Sample for Block {
 
 /// `BlockInfo` is the object we store in the storage. It consists of the
 /// block as well as the execution result of this block.
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash, schemars::JsonSchema)]
 pub struct BlockInfo {
     /// Block id
     pub block_id: HashValue,
     /// The total difficulty.
+    #[schemars(with = "String")]
     pub total_difficulty: U256,
     /// The transaction accumulator info
     pub txn_accumulator_info: AccumulatorInfo,

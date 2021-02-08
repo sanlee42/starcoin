@@ -50,13 +50,13 @@ mod script;
 #[cfg(test)]
 mod tests;
 mod transaction_argument;
-
+use schemars::JsonSchema;
 pub type Version = u64; // Height - also used for MVCC in StateDB
 
 pub const MAX_TRANSACTION_SIZE_IN_BYTES: usize = 4096;
 
 /// RawUserTransaction is the portion of a transaction that a client signs
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash, JsonSchema)]
 pub struct RawUserTransaction {
     /// Sender's address.
     sender: AccountAddress,
@@ -276,7 +276,7 @@ impl Sample for RawUserTransaction {
     }
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub enum TransactionPayload {
     /// A transaction that executes code.
     Script(Script),
@@ -326,7 +326,7 @@ impl From<TransactionPayloadType> for u8 {
 /// **IMPORTANT:** The signature of a `SignedUserTransaction` is not guaranteed to be verified. For a
 /// transaction whose signature is statically guaranteed to be verified, see
 /// [`SignatureCheckedTransaction`].
-#[derive(Clone, Eq, PartialEq, Hash, Serialize, CryptoHasher, CryptoHash)]
+#[derive(Clone, Eq, PartialEq, Hash, Serialize, CryptoHasher, CryptoHash, JsonSchema)]
 pub struct SignedUserTransaction {
     #[serde(skip)]
     id: Option<HashValue>,

@@ -6,8 +6,9 @@ use anyhow::{Error, Result};
 use futures::Stream;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
+use schemars::JsonSchema;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub enum ServiceStatus {
     /// Actor thread and Service is started and running.
     Started,
@@ -29,7 +30,7 @@ impl ServiceStatus {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct ServiceInfo {
     pub name: String,
     pub status: ServiceStatus,
@@ -69,15 +70,15 @@ impl Message for ServicePing {
 
 #[derive(Clone, Debug)]
 pub(crate) struct ServiceEventStream<Fut>
-where
-    Fut: Stream + 'static,
+    where
+        Fut: Stream + 'static,
 {
     pub stream: Fut,
 }
 
 impl<Fut> Message for ServiceEventStream<Fut>
-where
-    Fut: Stream,
+    where
+        Fut: Stream,
 {
     type Result = ();
 }

@@ -30,19 +30,22 @@ use std::{
     collections::{HashMap, HashSet},
     time::Duration,
 };
+use schemars::JsonSchema;
 
 /// Returns general information about the networking.
 ///
 /// Meant for general diagnostic purposes.
 ///
 /// **Warning**: This API is not stable.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct NetworkState {
     /// PeerId of the local node.
     pub peer_id: String,
     /// List of addresses the node is currently listening on.
+    #[schemars(with="HashSet<String>")]
     pub listened_addresses: HashSet<Multiaddr>,
     /// List of addresses the node knows it can be reached as.
+    #[schemars(with="HashSet<String>")]
     pub external_addresses: HashSet<Multiaddr>,
     /// List of node we're connected to.
     pub connected_peers: HashMap<String, Peer>,
@@ -53,9 +56,10 @@ pub struct NetworkState {
 }
 
 /// Part of the `NetworkState` struct. Unstable.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct NotConnectedPeer {
     /// List of addresses known for this node.
+    #[schemars(with = "HashSet<String>")]
     pub known_addresses: HashSet<Multiaddr>,
     /// Node information, as provided by the node itself, if we were ever connected to this node.
     pub version_string: Option<String>,
@@ -64,7 +68,7 @@ pub struct NotConnectedPeer {
 }
 
 /// Part of the `NetworkState` struct. Unstable.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Peer {
     /// How we are connected to the node.
     pub endpoint: PeerEndpoint,
@@ -79,19 +83,22 @@ pub struct Peer {
     /// with this peer.
     pub open: bool,
     /// List of addresses known for this node.
+    #[schemars(with = "HashSet<String>")]
     pub known_addresses: HashSet<Multiaddr>,
 }
 
 /// Part of the `NetworkState` struct. Unstable.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub enum PeerEndpoint {
     /// We are dialing the given address.
-    Dialing(Multiaddr),
+    Dialing(#[schemars(with = "String")]Multiaddr),
     /// We are listening.
     Listening {
         /// Local address of the connection.
+        #[schemars(with = "String")]
         local_addr: Multiaddr,
         /// Address data is sent back to.
+        #[schemars(with = "String")]
         send_back_addr: Multiaddr,
     },
 }

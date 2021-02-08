@@ -78,7 +78,7 @@ impl std::fmt::Display for ChainInfo {
 }
 
 /// The latest status of a chain.
-#[derive(Eq, PartialEq, Hash, Deserialize, Serialize, Clone, Debug)]
+#[derive(Eq, PartialEq, Hash, Deserialize, Serialize, Clone, Debug,schemars::JsonSchema)]
 pub struct ChainStatus {
     /// Chain head block's header.
     pub head: BlockHeader,

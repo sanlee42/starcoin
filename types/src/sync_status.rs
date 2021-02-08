@@ -6,13 +6,14 @@ use crate::startup_info::ChainStatus;
 use serde::{Deserialize, Serialize};
 use starcoin_uint::U256;
 
-#[derive(Eq, PartialEq, Deserialize, Serialize, Clone, Debug)]
+#[derive(Eq, PartialEq, Deserialize, Serialize, Clone, Debug, schemars::JsonSchema)]
 pub enum SyncState {
     /// Prepare to check sync status
     Prepare,
     /// Node is synchronizing, BlockIdAndNumber is target.
     Synchronizing {
         target: BlockIdAndNumber,
+        #[schemars(with="String")]
         total_difficulty: U256,
     },
     /// Node is synchronized with peers.
@@ -33,7 +34,7 @@ impl SyncState {
     }
 }
 
-#[derive(Eq, PartialEq, Deserialize, Serialize, Clone, Debug)]
+#[derive(Eq, PartialEq, Deserialize, Serialize, Clone, Debug, schemars::JsonSchema)]
 pub struct SyncStatus {
     chain_status: ChainStatus,
     state: SyncState,

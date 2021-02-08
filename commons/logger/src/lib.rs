@@ -38,7 +38,7 @@ pub fn stacktrace(err: anyhow::Error) {
 const LOG_PATTERN_WITH_LINE: &str = "{d} {l} {M}::{f}::{L} - {m}{n}";
 const LOG_PATTERN_DEFAULT: &str = "{d} {l} - {m}{n}";
 
-#[derive(Clone, Debug, Hash, PartialOrd, PartialEq, Ord, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, PartialOrd, PartialEq, Ord, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub enum LogPattern {
     Default,
     WithLine,
@@ -381,8 +381,8 @@ fn parse_spec(spec: &str) -> LogLevelSpec {
                             Ok(num) => {
                                 if global_fallback_level.is_some() {
                                     eprintln!(
-                                    "warning: multi global level specified, only use first one!"
-                                );
+                                        "warning: multi global level specified, only use first one!"
+                                    );
                                 } else {
                                     global_fallback_level = Some(num);
                                 }

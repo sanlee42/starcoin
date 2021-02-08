@@ -47,15 +47,18 @@ use starcoin_vm_types::write_set::WriteOp;
 use std::collections::BTreeMap;
 use std::convert::{TryFrom, TryInto};
 use std::str::FromStr;
+use schemars::JsonSchema;
 
 pub type ByteCode = Vec<u8>;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct AnnotatedMoveStructView {
     pub is_resource: bool,
     pub type_: StructTagView,
+    #[schemars(with = "String")]
     pub value: Vec<(Identifier, AnnotatedMoveValueView)>,
 }
+
 impl From<AnnotatedMoveStruct> for AnnotatedMoveStructView {
     fn from(origin: AnnotatedMoveStruct) -> Self {
         Self {
@@ -70,13 +73,14 @@ impl From<AnnotatedMoveStruct> for AnnotatedMoveStructView {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub enum AnnotatedMoveValueView {
     U8(u8),
     U64(StrView<u64>),
     U128(StrView<u128>),
     Bool(bool),
     Address(AccountAddress),
+    #[schemars(with = "String")]
     Vector(Vec<AnnotatedMoveValueView>),
     Bytes(StrView<Vec<u8>>),
     Struct(AnnotatedMoveStructView),
@@ -99,13 +103,13 @@ impl From<AnnotatedMoveValue> for AnnotatedMoveValueView {
     }
 }
 
-#[derive(Default, Clone, Debug, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Deserialize, Serialize,JsonSchema)]
 pub struct AccountStateSetView {
     pub codes: BTreeMap<Identifier, StrView<ByteCode>>,
     pub resources: BTreeMap<StructTagView, AnnotatedMoveStructView>,
 }
 
-#[derive(Default, Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Eq, PartialEq, Deserialize, Serialize, JsonSchema)]
 pub struct TransactionRequest {
     /// Sender's address.
     pub sender: Option<AccountAddress>,
@@ -161,7 +165,7 @@ impl From<RawUserTransaction> for TransactionRequest {
     }
 }
 
-#[derive(Default, Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Default, Clone, Debug, Eq, PartialEq, Deserialize, Serialize, JsonSchema)]
 pub struct DryRunTransactionRequest {
     #[serde(flatten)]
     pub transaction: TransactionRequest,
@@ -169,7 +173,7 @@ pub struct DryRunTransactionRequest {
     pub sender_public_key: Option<StrView<AccountPublicKey>>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize, JsonSchema)]
 pub struct ScriptData {
     pub code: StrView<ByteCodeOrScriptName>,
     #[serde(default)]
@@ -192,13 +196,13 @@ impl From<Script> for ScriptData {
     }
 }
 
-#[derive(Clone, Debug, Eq, Ord, PartialOrd, PartialEq)]
+#[derive(Clone, Debug, Eq, Ord, PartialOrd, PartialEq, JsonSchema)]
 pub enum ByteCodeOrScriptName {
     ByteCode(ByteCode),
     ScriptName(String),
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct BlockHeaderView {
     pub block_hash: HashValue,
     /// Parent hash.
@@ -220,6 +224,7 @@ pub struct BlockHeaderView {
     /// Gas used for contracts execution.
     pub gas_used: StrView<u64>,
     /// Block difficulty
+    #[schemars(with = "String")]
     pub difficulty: U256,
     /// hash for block body
     pub body_hash: HashValue,
@@ -230,6 +235,7 @@ pub struct BlockHeaderView {
     /// block header extra
     pub extra: BlockHeaderExtra,
 }
+
 impl From<BlockHeader> for BlockHeaderView {
     fn from(origin: BlockHeader) -> Self {
         BlockHeaderView {
@@ -252,7 +258,7 @@ impl From<BlockHeader> for BlockHeaderView {
     }
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RawUserTransactionView {
     /// Sender's address.
     pub sender: AccountAddress,
@@ -261,8 +267,8 @@ pub struct RawUserTransactionView {
 
     // The transaction payload in bcs_ext bytes.
     #[serde(
-        serialize_with = "serialize_binary",
-        deserialize_with = "deserialize_binary"
+    serialize_with = "serialize_binary",
+    deserialize_with = "deserialize_binary"
     )]
     pub payload: Vec<u8>,
 
@@ -300,7 +306,7 @@ impl TryFrom<RawUserTransaction> for RawUserTransactionView {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 pub struct SignedUserTransactionView {
     pub transaction_hash: HashValue,
     /// The raw transaction
@@ -324,7 +330,7 @@ impl TryFrom<SignedUserTransaction> for SignedUserTransactionView {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 pub struct BlockMetadataView {
     /// Parent block hash.
     pub parent_hash: HashValue,
@@ -361,6 +367,7 @@ impl From<BlockMetadata> for BlockMetadataView {
         }
     }
 }
+
 impl Into<BlockMetadata> for BlockMetadataView {
     fn into(self) -> BlockMetadata {
         let BlockMetadataView {
@@ -386,7 +393,7 @@ impl Into<BlockMetadata> for BlockMetadataView {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct TransactionView {
     pub block_hash: HashValue,
     pub block_number: StrView<BlockNumber>,
@@ -431,7 +438,7 @@ impl TransactionView {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 pub enum BlockTransactionsView {
     Hashes(Vec<HashValue>),
     Full(Vec<SignedUserTransactionView>),
@@ -464,7 +471,7 @@ impl From<Vec<HashValue>> for BlockTransactionsView {
     }
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct BlockView {
     pub header: BlockHeaderView,
     pub body: BlockTransactionsView,
@@ -492,11 +499,12 @@ impl TryFrom<Block> for BlockView {
     }
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct BlockSummaryView {
     pub header: BlockHeaderView,
     pub uncles: Vec<BlockHeaderView>,
 }
+
 impl From<BlockSummary> for BlockSummaryView {
     fn from(summary: BlockSummary) -> Self {
         BlockSummaryView {
@@ -510,7 +518,7 @@ impl From<BlockSummary> for BlockSummaryView {
     }
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct TransactionInfoView {
     pub block_hash: HashValue,
     pub block_number: StrView<u64>,
@@ -557,7 +565,7 @@ impl TransactionInfoView {
     }
 }
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub enum TransactionVMStatus {
     Executed,
     OutOfGas,
@@ -575,6 +583,7 @@ pub enum TransactionVMStatus {
         status_code: StrView<u64>,
     },
 }
+
 impl From<TransactionStatus> for TransactionVMStatus {
     fn from(s: TransactionStatus) -> Self {
         match s {
@@ -606,6 +615,7 @@ impl From<KeptVMStatus> for TransactionVMStatus {
         }
     }
 }
+
 impl From<DiscardedVMStatus> for TransactionVMStatus {
     fn from(s: DiscardedVMStatus) -> Self {
         Self::Discard {
@@ -614,7 +624,7 @@ impl From<DiscardedVMStatus> for TransactionVMStatus {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone, schemars::JsonSchema)]
 pub struct TransactionEventView {
     pub block_hash: Option<HashValue>,
     pub block_number: Option<StrView<BlockNumber>>,
@@ -623,8 +633,8 @@ pub struct TransactionEventView {
     pub transaction_index: Option<u32>,
 
     #[serde(
-        serialize_with = "serialize_binary",
-        deserialize_with = "deserialize_binary"
+    serialize_with = "serialize_binary",
+    deserialize_with = "deserialize_binary"
     )]
     pub data: Vec<u8>,
     pub type_tag: TypeTag,
@@ -646,6 +656,7 @@ impl From<ContractEventInfo> for TransactionEventView {
         }
     }
 }
+
 impl From<ContractEvent> for TransactionEventView {
     fn from(event: ContractEvent) -> Self {
         TransactionEventView {
@@ -681,7 +692,8 @@ impl TransactionEventView {
         }
     }
 }
-#[derive(Clone, Debug, Serialize, Deserialize)]
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TransactionOutputView {
     pub events: Vec<TransactionEventView>,
     pub gas_used: StrView<u64>,
@@ -707,18 +719,19 @@ impl From<TransactionOutput> for TransactionOutputView {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TransactionOutputAction {
     #[serde(flatten)]
     pub access_path: AccessPathView,
     pub action: WriteOpView,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum WriteOpView {
     Deletion,
     Value(StrView<Vec<u8>>),
 }
+
 impl From<WriteOp> for WriteOpView {
     fn from(op: WriteOp) -> Self {
         match op {
@@ -728,7 +741,7 @@ impl From<WriteOp> for WriteOpView {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct AccessPathView {
     pub address: AccountAddress,
     pub path: String,
@@ -743,7 +756,7 @@ impl From<AccessPath> for AccessPathView {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct UncleSummaryView {
     /// total uncle
     pub uncles: StrView<u64>,
@@ -766,7 +779,7 @@ impl From<UncleSummary> for UncleSummaryView {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EpochUncleSummaryView {
     /// epoch number
     pub epoch: StrView<u64>,
@@ -784,7 +797,7 @@ impl From<EpochUncleSummary> for EpochUncleSummaryView {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ChainInfoView {
     pub chain_id: u8,
     pub genesis_hash: HashValue,
@@ -806,7 +819,7 @@ impl From<ChainInfo> for ChainInfoView {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct PeerInfoView {
     pub peer_id: PeerId,
     pub chain_info: ChainInfoView,
@@ -822,13 +835,14 @@ impl From<PeerInfo> for PeerInfoView {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct StateWithProofView {
     pub state: Option<StrView<Vec<u8>>>,
     pub account_state: Option<StrView<Vec<u8>>>,
     pub account_proof: SparseMerkleProof,
     pub account_state_proof: SparseMerkleProof,
 }
+
 impl StateWithProofView {
     pub fn state_proof(&self) -> StateProof {
         StateProof::new(
@@ -863,7 +877,7 @@ impl From<StateWithProofView> for StateWithProof {
     }
 }
 
-#[derive(Debug, PartialEq, Hash, Eq, Clone, Copy, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Hash, Eq, Clone, Copy, PartialOrd, Ord, JsonSchema)]
 pub struct StrView<T>(pub T);
 
 impl<T> From<T> for StrView<T> {
@@ -873,25 +887,25 @@ impl<T> From<T> for StrView<T> {
 }
 
 impl<T> Serialize for StrView<T>
-where
-    Self: ToString,
+    where
+        Self: ToString,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
 }
 
 impl<'de, T> Deserialize<'de> for StrView<T>
-where
-    Self: FromStr,
-    <Self as FromStr>::Err: std::fmt::Display,
+    where
+        Self: FromStr,
+        <Self as FromStr>::Err: std::fmt::Display,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         let s = <String>::deserialize(deserializer)?;
 
@@ -923,6 +937,7 @@ impl FromStr for StrView<ModuleId> {
         Ok(Self(ModuleId::new(module_addr, module_name)))
     }
 }
+
 impl std::fmt::Display for StrView<TypeTag> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.0)
@@ -937,6 +952,7 @@ impl FromStr for TypeTagView {
         Ok(Self(type_tag))
     }
 }
+
 impl std::fmt::Display for StrView<StructTag> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.0)
@@ -954,6 +970,7 @@ impl FromStr for StructTagView {
         }
     }
 }
+
 impl std::fmt::Display for StrView<TransactionArgument> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", &self.0)
@@ -1035,7 +1052,7 @@ macro_rules! impl_str_view_for {
 }
 impl_str_view_for! {u64 i64 u128 i128}
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
 pub struct ContractCall {
     pub module_address: AccountAddress,
     pub module_name: String,

@@ -13,7 +13,7 @@ use starcoin_types::filter::Filter;
 use starcoin_types::U256;
 use starcoin_vm_types::genesis_config::ConsensusStrategy;
 use std::convert::TryInto;
-
+use schemars::JsonSchema;
 /// Subscription kind.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
 #[serde(deny_unknown_fields)]
@@ -88,7 +88,7 @@ impl<'a> Deserialize<'a> for Params {
 }
 
 /// Filter
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Eq, Hash)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Eq, Hash, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct EventFilter {
     /// From Block

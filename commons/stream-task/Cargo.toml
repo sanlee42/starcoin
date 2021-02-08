@@ -17,7 +17,7 @@ pin-project = "0.4.8"
 log = "0.4.14"
 serde = { version = "1.0.123", features = ["derive"] }
 parking_lot = "0.11.1"
-
+schemars = "0.8.3"
 [dev-dependencies]
 stest = { path = "../stest" }
 starcoin-logger = { path = "../logger"}

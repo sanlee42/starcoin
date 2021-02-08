@@ -244,14 +244,6 @@ TypeTag:
       Address: UNIT
     5:
       Signer: UNIT
-    6:
-      Vector:
-        NEWTYPE:
-          TYPENAME: TypeTag
-    7:
-      Struct:
-        NEWTYPE:
-          TYPENAME: StructTag
 WithdrawCapabilityResource:
   STRUCT:
     - account_address:

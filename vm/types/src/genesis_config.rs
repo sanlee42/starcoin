@@ -37,6 +37,7 @@ use std::io::{Read, Write};
 use std::path::Path;
 use std::str::FromStr;
 use std::sync::Arc;
+use schemars::JsonSchema;
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum StdlibVersion {
@@ -73,18 +74,19 @@ impl Default for StdlibVersion {
 }
 
 #[derive(
-    Clone,
-    Copy,
-    Debug,
-    Deserialize,
-    Eq,
-    Hash,
-    PartialEq,
-    PartialOrd,
-    Ord,
-    Serialize,
-    IntoPrimitive,
-    TryFromPrimitive,
+Clone,
+Copy,
+Debug,
+Deserialize,
+Eq,
+Hash,
+PartialEq,
+PartialOrd,
+Ord,
+Serialize,
+IntoPrimitive,
+TryFromPrimitive,
+JsonSchema
 )]
 #[repr(u8)]
 #[serde(tag = "type")]
@@ -133,18 +135,19 @@ impl FromStr for ConsensusStrategy {
 }
 
 #[derive(
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    PartialEq,
-    PartialOrd,
-    Ord,
-    IntoPrimitive,
-    TryFromPrimitive,
-    Deserialize,
-    Serialize,
+Clone,
+Copy,
+Debug,
+Eq,
+Hash,
+PartialEq,
+PartialOrd,
+Ord,
+IntoPrimitive,
+TryFromPrimitive,
+Deserialize,
+Serialize,
+JsonSchema,
 )]
 #[repr(u8)]
 pub enum BuiltinNetworkID {
@@ -290,7 +293,7 @@ impl From<BuiltinNetworkID> for ChainNetwork {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize, JsonSchema)]
 pub struct CustomNetworkID {
     chain_name: String,
     chain_id: ChainId,
@@ -333,7 +336,7 @@ impl FromStr for CustomNetworkID {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, schemars::JsonSchema)]
 pub enum ChainNetworkID {
     Builtin(BuiltinNetworkID),
     Custom(CustomNetworkID),
@@ -368,8 +371,8 @@ impl FromStr for ChainNetworkID {
 
 impl Serialize for ChainNetworkID {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(self.to_string().as_str())
     }
@@ -377,8 +380,8 @@ impl Serialize for ChainNetworkID {
 
 impl<'de> Deserialize<'de> for ChainNetworkID {
     fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         let s = <String>::deserialize(deserializer)?;
         Self::from_str(s.as_str()).map_err(D::Error::custom)
@@ -636,7 +639,7 @@ impl ChainNetwork {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, Hash, Eq, PartialEq, PartialOrd, Ord, JsonSchema)]
 pub struct ChainId {
     id: u8,
 }
@@ -798,8 +801,8 @@ impl GenesisConfig {
     }
 
     pub fn load<P>(path: P) -> Result<GenesisConfig>
-    where
-        P: AsRef<Path>,
+        where
+            P: AsRef<Path>,
     {
         let mut file = File::open(&path)?;
         let mut contents = String::new();
@@ -808,8 +811,8 @@ impl GenesisConfig {
     }
 
     pub fn save<P>(&self, path: P) -> Result<()>
-    where
-        P: AsRef<Path>,
+        where
+            P: AsRef<Path>,
     {
         let mut file = File::create(&path)?;
         let buf = serde_json::to_vec(self)?;
@@ -1000,7 +1003,7 @@ pub static HALLEY_BOOT_NODES: Lazy<Vec<MultiaddrWithPeerId>> = Lazy::new(|| {
 pub static HALLEY_CONFIG: Lazy<GenesisConfig> = Lazy::new(|| {
     GenesisConfig {
         genesis_block_parameter: GenesisBlockParameterConfig::Static(
-            GenesisBlockParameter{
+            GenesisBlockParameter {
                 parent_hash: HashValue::sha3_256_of(b"starcoin_halley"),
                 timestamp: 1611575511000,
                 difficulty: 100.into(),
@@ -1056,7 +1059,7 @@ pub static PROXIMA_BOOT_NODES: Lazy<Vec<MultiaddrWithPeerId>> = Lazy::new(|| {
 pub static PROXIMA_CONFIG: Lazy<GenesisConfig> = Lazy::new(|| {
     GenesisConfig {
         genesis_block_parameter: GenesisBlockParameterConfig::Static(
-            GenesisBlockParameter{
+            GenesisBlockParameter {
                 parent_hash: HashValue::sha3_256_of(b"starcoin_proxima"),
                 timestamp: 1606984483000,
                 difficulty: 100.into(),
