@@ -13,11 +13,10 @@ jobs:
       matrix:
         platform:
           - ubuntu-latest
-          - ubuntu-18.04
-          - ubuntu-22.04
+          - ubuntu-20.04
           - macos-latest
           - windows-latest
-    runs-on: ${{matrix.platform}}
+    runs-on: [self-hosted, ${{ matrix.platform }}]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
